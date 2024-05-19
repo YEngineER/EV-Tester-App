@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+	<LangVersion>11.0</LangVersion>
+    <RootNamespace>EV_Testing_report_DEMO</RootNamespace>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\acer\.nuget\packages\select.htmltopdf.netcore\23.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\acer\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Html.dep" />
+    <Content Remove="C:\Users\acer\.nuget\packages\select.pdf\23.1.0\contentFiles\any\any\Select.Tools.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MiniWord" Version="0.7.0" />
+    <PackageReference Include="Select.HtmlToPdf" Version="23.1.0" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="23.1.0" />
+    <PackageReference Include="Select.Pdf" Version="23.1.0" />
+    <PackageReference Include="Syncfusion.DocIO.WinForms" Version="23.1.44" />
+    <PackageReference Include="System.IO.Ports" Version="7.0.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+
+</Project>
