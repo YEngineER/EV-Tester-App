@@ -1123,368 +1123,7 @@ namespace EV_Testing_report_DEMO
             esp32_module.WriteLine("Diode_Test\n");
             receive_present_state = ReportReceive_states.Req_Diode;
         }
-        private void ExportPDF_Click(object sender, EventArgs e)
-        {
-            //ExportPDF.Text = Save_to.SelectedPath;
-            String html_to_export = "";
-
-            html_to_export += "<p><img style=\"float: right;\" src=\"https://www.eng.kmutnb.ac.th/wp-content/uploads/2019/08/LOGO-KMUTNB--300x300.png\" alt=\"\" width=\"200\" height=\"200\" /></p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">King Mongkut's University of Technology North Bangkok</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">1518 Pracharat 1 Road, Wongsawang, Bangsue, Bangkok 10800</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Tel. 02-555-2000 Ext. 8518-8520</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Email: <a href=\"mailto:teratam.b@eng.kmutnb.ac.th\">teratam.b@eng.kmutnb.ac.th</a></p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<hr style=\"padding-left: 60px;\" /><hr style=\"padding-left: 40px;\" />";
-            html_to_export += "<h2 style=\"padding-left: 60px; text-align: justify;\"><strong>Power System Laboratory</strong></h2>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Department of Engineering and Computer Engineering</p>";
-            html_to_export += "<hr style=\"padding-left: 60px;\" />";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<h1 style=\"padding-left: 60px; text-align: justify;\">รายงานผลการทดสอบเครื่องชาร์จรถยนต์ไฟฟ้าแบบกระแสสลับ</h1>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">เสนอ</p>";
-            html_to_export += "<h3 style=\"padding-left: 60px; text-align: justify;\">บริษัท IBS Corporation จำกัด</h4>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">โดย</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์ คณะวิศวกรรมศาสตร์</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ</p>";
-
-            html_to_export += "<p>&#13;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State A to B : ";
-            /*
-            if (result_State_A_to_B.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            */
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State B to C : ";
-            /*
-            if (result_State_B_to_C.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }*/
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains On Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsOnDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsFreq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State C to B : ";
-            /*
-            if (result_State_C_to_B.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            */
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"border-collapse: collapse; width: 100%; height: 273px;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Short Circuit : ";
-            if (result_diode_test.Diode_ShortCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_ShortCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Short Circuit Ground : ";
-            if (result_diode_test.PE_OpenCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.PE_OpenCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Open Circuit : ";
-            if (result_diode_test.Diode_OpenCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_OpenCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Rcd0 : ";
-            if (result_rcd_test.RCD0_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Trip Time</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Trip_Time + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Limit</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Limit + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Current</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Current + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Insulation Test : ";
-            if (Insulation_Test.Insulation_Testing)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">L-PE</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.L_PE + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">N-PE</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.N_PE + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Voltage</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.Voltage + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            /*
-            <table style="border-collapse: collapse; width: 30%; height: 100px;" border="1">
-            <tbody>
-            <tr style="height: 19px;">
-            <td style="width: 50%; text-align: center; height: 19px;">Value</td>
-            <td style="width: 50%; text-align: center; height: 19px;">Data</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 1</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 2</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 3</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            </tbody>
-            </table>
-             
-             */
-
-            //var pdf_file = new ChromePdfRenderer();
-            // instantiate a html to pdf converter object
-            HtmlToPdf pdf_file = new HtmlToPdf();
-            pdf_file.Options.PdfPageSize = PdfPageSize.A4;
-            pdf_file.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
-            pdf_file.Options.MarginBottom = 14;
-            pdf_file.Options.MarginTop = 12;
-            pdf_file.Options.MarginLeft = 10;
-            pdf_file.Options.MarginRight = 10;
-
-
-            //= pdf_file.RenderHtmlAsPdf(html_to_export);
-            PdfDocument doc = pdf_file.ConvertHtmlString(html_to_export);
-
-
-
-            doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.pdf");
-            doc.Close();
-        }
+        
 
         private void exp_dir_Click(object sender, EventArgs e)
         {
@@ -2128,6 +1767,368 @@ var Package_request = new Request_Testing_Result
 Package_req = "State_B_to_C"
 };
 }*/
+        private void ExportPDF_Click(object sender, EventArgs e)
+        {
+            //ExportPDF.Text = Save_to.SelectedPath;
+            String html_to_export = "";
+
+            html_to_export += "<p><img style=\"float: right;\" src=\"https://www.eng.kmutnb.ac.th/wp-content/uploads/2019/08/LOGO-KMUTNB--300x300.png\" alt=\"\" width=\"200\" height=\"200\" /></p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">King Mongkut's University of Technology North Bangkok</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">1518 Pracharat 1 Road, Wongsawang, Bangsue, Bangkok 10800</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Tel. 02-555-2000 Ext. 8518-8520</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Email: <a href=\"mailto:teratam.b@eng.kmutnb.ac.th\">teratam.b@eng.kmutnb.ac.th</a></p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<hr style=\"padding-left: 60px;\" /><hr style=\"padding-left: 40px;\" />";
+            html_to_export += "<h2 style=\"padding-left: 60px; text-align: justify;\"><strong>Power System Laboratory</strong></h2>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Department of Engineering and Computer Engineering</p>";
+            html_to_export += "<hr style=\"padding-left: 60px;\" />";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
+            html_to_export += "<h1 style=\"padding-left: 60px; text-align: justify;\">รายงานผลการทดสอบเครื่องชาร์จรถยนต์ไฟฟ้าแบบกระแสสลับ</h1>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">เสนอ</p>";
+            html_to_export += "<h3 style=\"padding-left: 60px; text-align: justify;\">บริษัท IBS Corporation จำกัด</h4>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">โดย</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์ คณะวิศวกรรมศาสตร์</p>";
+            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ</p>";
+
+            html_to_export += "<p>&#13;</p>";
+
+            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>State A to B : ";
+            /*
+            if (result_State_A_to_B.Testing_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            */
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_StartupDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Amplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_NveAmplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Freq + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_DutyCycle + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Imax + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>State B to C : ";
+            /*
+            if (result_State_B_to_C.Testing_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }*/
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_StartupDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Amplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_NveAmplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Freq + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_DutyCycle + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Imax + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains On Delay</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsOnDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains Freq</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsFreq + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>State C to B : ";
+            /*
+            if (result_State_C_to_B.Testing_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            */
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_StartupDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Amplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_NveAmplitude + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Freq + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_DutyCycle + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Imax + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<table style=\"border-collapse: collapse; width: 100%; height: 273px;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>Diode Short Circuit : ";
+            if (result_diode_test.Diode_ShortCircuit_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_ShortCircuit_MainsOffDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>Diode Short Circuit Ground : ";
+            if (result_diode_test.PE_OpenCircuit_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.PE_OpenCircuit_MainsOffDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>Diode Open Circuit : ";
+            if (result_diode_test.Diode_OpenCircuit_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
+            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_OpenCircuit_MainsOffDelay + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>Rcd0 : ";
+            if (result_rcd_test.RCD0_Result)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Trip Time</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Trip_Time + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Limit</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Limit + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Current</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Current + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+            html_to_export += "<p>&nbsp;</p>";
+
+            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
+            html_to_export += "<tbody>";
+            html_to_export += "<tr style=\"height: 73px;\">";
+            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
+            html_to_export += "<h1>Insulation Test : ";
+            if (Insulation_Test.Insulation_Testing)
+            {
+                html_to_export += "Pass";
+            }
+            else
+            {
+                html_to_export += "Fail";
+            }
+            html_to_export += "</h1>";
+            html_to_export += "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">L-PE</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.L_PE + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">N-PE</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.N_PE + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "<tr style=\"height: 18px;\">";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Voltage</td>";
+            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.Voltage + "</td>";
+            html_to_export += "</tr>";
+            html_to_export += "</tbody>";
+            html_to_export += "</table>";
+
+            /*
+            <table style="border-collapse: collapse; width: 30%; height: 100px;" border="1">
+            <tbody>
+            <tr style="height: 19px;">
+            <td style="width: 50%; text-align: center; height: 19px;">Value</td>
+            <td style="width: 50%; text-align: center; height: 19px;">Data</td>
+            </tr>
+            <tr style="height: 31px;">
+            <td style="width: 50%; text-align: center; height: 31px;">Val 1</td>
+            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 31px;">
+            <td style="width: 50%; text-align: center; height: 31px;">Val 2</td>
+            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
+            </tr>
+            <tr style="height: 31px;">
+            <td style="width: 50%; text-align: center; height: 31px;">Val 3</td>
+            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
+            </tr>
+            </tbody>
+            </table>
+             
+             */
+
+            //var pdf_file = new ChromePdfRenderer();
+            // instantiate a html to pdf converter object
+            HtmlToPdf pdf_file = new HtmlToPdf();
+            pdf_file.Options.PdfPageSize = PdfPageSize.A4;
+            pdf_file.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
+            pdf_file.Options.MarginBottom = 14;
+            pdf_file.Options.MarginTop = 12;
+            pdf_file.Options.MarginLeft = 10;
+            pdf_file.Options.MarginRight = 10;
+
+
+            //= pdf_file.RenderHtmlAsPdf(html_to_export);
+            PdfDocument doc = pdf_file.ConvertHtmlString(html_to_export);
+
+
+
+            doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.pdf");
+            doc.Close();
+        }
     }
 
     public class Request_Testing_Result
@@ -2199,4 +2200,6 @@ Package_req = "State_B_to_C"
         Req_Insul,
         Req_Diode
     }
+
+
 }
