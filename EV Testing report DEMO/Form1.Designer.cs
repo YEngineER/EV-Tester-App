@@ -218,17 +218,28 @@
             BD_PWM_MainFreq_Result = new Label();
             BD_Voltage_Result = new Label();
             BD_PP_Result = new Label();
+            tabControl2 = new TabControl();
+            tabPage3 = new TabPage();
+            tabPage4 = new TabPage();
+            Bluetooth_Connect = new Button();
+            label68 = new Label();
+            Bluetooth_Devices_List = new ComboBox();
+            TestBluetooth = new Button();
+            TestBluetoothTxt = new Label();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabControl2.SuspendLayout();
+            tabPage3.SuspendLayout();
+            tabPage4.SuspendLayout();
             SuspendLayout();
             // 
             // Connect_ESP_BTN
             // 
-            Connect_ESP_BTN.Location = new Point(472, 35);
+            Connect_ESP_BTN.Location = new Point(160, 16);
             Connect_ESP_BTN.Margin = new Padding(2);
             Connect_ESP_BTN.Name = "Connect_ESP_BTN";
-            Connect_ESP_BTN.Size = new Size(78, 41);
+            Connect_ESP_BTN.Size = new Size(88, 41);
             Connect_ESP_BTN.TabIndex = 1;
             Connect_ESP_BTN.Text = "Connect to ESP32";
             Connect_ESP_BTN.UseVisualStyleBackColor = true;
@@ -237,7 +248,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(315, 35);
+            label1.Location = new Point(8, 32);
             label1.Margin = new Padding(2, 0, 2, 0);
             label1.Name = "label1";
             label1.Size = new Size(63, 15);
@@ -246,7 +257,7 @@
             // 
             // COM_Input
             // 
-            COM_Input.Location = new Point(387, 35);
+            COM_Input.Location = new Point(72, 24);
             COM_Input.Margin = new Padding(2);
             COM_Input.Name = "COM_Input";
             COM_Input.Size = new Size(82, 23);
@@ -258,7 +269,7 @@
             // ESP_Status
             // 
             ESP_Status.AutoSize = true;
-            ESP_Status.Location = new Point(315, 61);
+            ESP_Status.Location = new Point(416, 56);
             ESP_Status.Margin = new Padding(2, 0, 2, 0);
             ESP_Status.Name = "ESP_Status";
             ESP_Status.Size = new Size(82, 15);
@@ -1101,7 +1112,7 @@
             // 
             // Test_ALL_BTN
             // 
-            Test_ALL_BTN.Location = new Point(667, 33);
+            Test_ALL_BTN.Location = new Point(768, 40);
             Test_ALL_BTN.Name = "Test_ALL_BTN";
             Test_ALL_BTN.Size = new Size(103, 45);
             Test_ALL_BTN.TabIndex = 88;
@@ -1363,9 +1374,8 @@
             // 
             // SerialMoni
             // 
-            SerialMoni.Enabled = false;
             SerialMoni.ImeMode = ImeMode.On;
-            SerialMoni.Location = new Point(16, 438);
+            SerialMoni.Location = new Point(16, 440);
             SerialMoni.Multiline = true;
             SerialMoni.Name = "SerialMoni";
             SerialMoni.Size = new Size(479, 140);
@@ -1414,7 +1424,7 @@
             // 
             // cancelBTN
             // 
-            cancelBTN.Location = new Point(555, 33);
+            cancelBTN.Location = new Point(680, 40);
             cancelBTN.Name = "cancelBTN";
             cancelBTN.Size = new Size(84, 45);
             cancelBTN.TabIndex = 119;
@@ -1424,7 +1434,7 @@
             // 
             // ClrResult
             // 
-            ClrResult.Location = new Point(785, 33);
+            ClrResult.Location = new Point(880, 40);
             ClrResult.Name = "ClrResult";
             ClrResult.Size = new Size(91, 45);
             ClrResult.TabIndex = 120;
@@ -2094,12 +2104,102 @@
             BD_PP_Result.TabIndex = 118;
             BD_PP_Result.Text = "-";
             // 
+            // tabControl2
+            // 
+            tabControl2.Controls.Add(tabPage3);
+            tabControl2.Controls.Add(tabPage4);
+            tabControl2.Location = new Point(48, 8);
+            tabControl2.Name = "tabControl2";
+            tabControl2.SelectedIndex = 0;
+            tabControl2.Size = new Size(368, 104);
+            tabControl2.TabIndex = 136;
+            // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(COM_Input);
+            tabPage3.Controls.Add(Connect_ESP_BTN);
+            tabPage3.Controls.Add(label1);
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Padding = new Padding(3);
+            tabPage3.Size = new Size(360, 76);
+            tabPage3.TabIndex = 0;
+            tabPage3.Text = "UART";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tabPage4
+            // 
+            tabPage4.Controls.Add(Bluetooth_Connect);
+            tabPage4.Controls.Add(label68);
+            tabPage4.Controls.Add(Bluetooth_Devices_List);
+            tabPage4.Location = new Point(4, 24);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Padding = new Padding(3);
+            tabPage4.Size = new Size(360, 76);
+            tabPage4.TabIndex = 1;
+            tabPage4.Text = "Bluetooth";
+            tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // Bluetooth_Connect
+            // 
+            Bluetooth_Connect.Enabled = false;
+            Bluetooth_Connect.Location = new Point(264, 16);
+            Bluetooth_Connect.Name = "Bluetooth_Connect";
+            Bluetooth_Connect.Size = new Size(80, 40);
+            Bluetooth_Connect.TabIndex = 3;
+            Bluetooth_Connect.Text = "Connect";
+            Bluetooth_Connect.UseVisualStyleBackColor = true;
+            Bluetooth_Connect.Click += Bluetooth_Connect_Click;
+            // 
+            // label68
+            // 
+            label68.AutoSize = true;
+            label68.Location = new Point(8, 32);
+            label68.Name = "label68";
+            label68.Size = new Size(42, 15);
+            label68.TabIndex = 1;
+            label68.Text = "Device";
+            // 
+            // Bluetooth_Devices_List
+            // 
+            Bluetooth_Devices_List.FormattingEnabled = true;
+            Bluetooth_Devices_List.Location = new Point(56, 24);
+            Bluetooth_Devices_List.Name = "Bluetooth_Devices_List";
+            Bluetooth_Devices_List.Size = new Size(192, 23);
+            Bluetooth_Devices_List.TabIndex = 0;
+            Bluetooth_Devices_List.DropDown += onDropdown;
+            Bluetooth_Devices_List.SelectionChangeCommitted += onsel_Bluetooth;
+            // 
+            // TestBluetooth
+            // 
+            TestBluetooth.Location = new Point(424, 80);
+            TestBluetooth.Name = "TestBluetooth";
+            TestBluetooth.Size = new Size(104, 23);
+            TestBluetooth.TabIndex = 137;
+            TestBluetooth.Text = "Test Bluetooth";
+            TestBluetooth.UseVisualStyleBackColor = true;
+            TestBluetooth.Visible = false;
+            TestBluetooth.Click += TestBluetooth_Click;
+            // 
+            // TestBluetoothTxt
+            // 
+            TestBluetoothTxt.AutoSize = true;
+            TestBluetoothTxt.Location = new Point(536, 88);
+            TestBluetoothTxt.Name = "TestBluetoothTxt";
+            TestBluetoothTxt.Size = new Size(44, 15);
+            TestBluetoothTxt.TabIndex = 138;
+            TestBluetoothTxt.Text = "label69";
+            TestBluetoothTxt.Visible = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1301, 590);
+            Controls.Add(TestBluetoothTxt);
+            Controls.Add(TestBluetooth);
+            Controls.Add(tabControl2);
             Controls.Add(tabControl1);
             Controls.Add(Exp_to);
             Controls.Add(Templ_from);
@@ -2256,9 +2356,6 @@
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(ESP_Status);
-            Controls.Add(COM_Input);
-            Controls.Add(label1);
-            Controls.Add(Connect_ESP_BTN);
             Margin = new Padding(2);
             Name = "Form1";
             Text = "EVSE Tester";
@@ -2268,6 +2365,11 @@
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
+            tabControl2.ResumeLayout(false);
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
+            tabPage4.ResumeLayout(false);
+            tabPage4.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -2463,5 +2565,13 @@
         private TextBox Chg_VaRated;
         private Label label63;
         private TextBox Chg_Irated;
+        private TabControl tabControl2;
+        private TabPage tabPage3;
+        private TabPage tabPage4;
+        private Label label68;
+        private ComboBox Bluetooth_Devices_List;
+        private Button Bluetooth_Connect;
+        private Button TestBluetooth;
+        private Label TestBluetoothTxt;
     }
 }

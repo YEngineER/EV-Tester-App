@@ -12,6 +12,11 @@ using System.Xml.Linq;
 using Syncfusion.DocIO.DLS;
 using MiniSoftware;
 
+using InTheHand.Net.Sockets;
+using InTheHand.Net.Bluetooth;
+using InTheHand.Net;
+using System.Text;
+
 namespace EV_Testing_report_DEMO
 {
 
@@ -34,6 +39,18 @@ namespace EV_Testing_report_DEMO
         bool isESP_connected = false;
         bool isTemplateSelected = false;
 
+        EVSE_Tester_CommunicationMode commu_mode = EVSE_Tester_CommunicationMode.None;
+
+
+        // Create new bluetooth device object
+        BluetoothClient client;
+        BluetoothDeviceInfo[] devices;
+        BluetoothDeviceInfo Selected_Device;
+        Boolean bluetooth_connecting = false;
+
+        Stream bluetoothStream;
+        byte[] receiveBuffer = new byte[512];
+
         public Form1()
         {
             InitializeComponent();
@@ -48,8 +65,6 @@ namespace EV_Testing_report_DEMO
 
             receive_present_state = ReportReceive_states.Standby;
 
-
-
             updateESP32_Connection_Status(esp32_module.IsOpen);
             updateStatus_BTN();
 
@@ -59,6 +74,9 @@ namespace EV_Testing_report_DEMO
 
             Exp_to.Text = Save_to.SelectedPath;
             SerialMoni.Visible = false;
+
+            client = new BluetoothClient();
+            scanBluetooth();
 
             //Req_report.Enabled = esp32_module.IsOpen;
         }
@@ -96,11 +114,14 @@ namespace EV_Testing_report_DEMO
                     }
                 }
 
+                commu_mode = EVSE_Tester_CommunicationMode.SerialPort;
+
             }
             else
             {
                 esp32_module.Close();
                 updateESP32_Connection_Status(esp32_module.IsOpen);
+                commu_mode = EVSE_Tester_CommunicationMode.None;
             }
         }
         private void Connect_ESP_BTN_Click(object sender, EventArgs e)
@@ -338,7 +359,7 @@ namespace EV_Testing_report_DEMO
                     read_result_B_to_D(JsonSerializer.Deserialize<State_Transition_Test>(indata));
                     testing_Check[3] = true;
 
-                    
+
                     if (scan_read)
                     {
                         hook_Test_CB();
@@ -1073,57 +1094,153 @@ namespace EV_Testing_report_DEMO
         private void Test_RCD_Click(object sender, EventArgs e)
         {
             hook_Test_RCD();
-            Enable_All_Test_BTN(false);
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
         }
 
         private void Test_Insulat_Click(object sender, EventArgs e)
         {
             hook_Test_Insulator();
-            Enable_All_Test_BTN(false);
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             hook_Test_Diode();
-            Enable_All_Test_BTN(false);
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
         }
 
         private void hook_Test_AB()
         {
-            esp32_module.WriteLine("State_A_to_B\n");
-            receive_present_state = ReportReceive_states.Req_AB;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("State_A_to_B\n");
+                    receive_present_state = ReportReceive_states.Req_AB;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("State_A_to_B\n");
+
+                    read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
+                    hook_Test_BC();
+                    break;  
+            }
         }
         private void hook_Test_BC()
         {
-            esp32_module.WriteLine("State_B_to_C\n");
-            receive_present_state = ReportReceive_states.Req_BC;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("State_B_to_C\n");
+                    receive_present_state = ReportReceive_states.Req_BC;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("State_B_to_C\n");
+                    read_result_B_to_C(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
+                    hook_Test_BD();
+                    break;
+            }
+            
         }
         private void hook_Test_CB()
         {
-            esp32_module.WriteLine("State_C_to_B\n");
-            receive_present_state = ReportReceive_states.Req_CB;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("State_C_to_B\n");
+                    receive_present_state = ReportReceive_states.Req_CB;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("State_C_to_B\n");
+                    read_result_C_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
+
+                    Enable_All_Test_BTN(true);
+                    scan_read = false;
+                    break;
+            }
+            
         }
         private void hook_Test_BD()
         {
-            esp32_module.WriteLine("State_B_to_D\n");
-            receive_present_state = ReportReceive_states.Req_BD;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("State_B_to_D\n");
+                    receive_present_state = ReportReceive_states.Req_BD;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("State_B_to_D\n");
+                    read_result_B_to_D(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
+                    hook_Test_CB();
+                    break;
+            }
+            
         }
         private void hook_Test_RCD()
         {
-            esp32_module.WriteLine("RCD0_Test\n");
-            receive_present_state = ReportReceive_states.Req_RCD;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("RCD0_Test\n");
+                    receive_present_state = ReportReceive_states.Req_RCD;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("RCD0_Test\n");
+
+                    read_result_RCD(JsonSerializer.Deserialize<RCD0>(receive_Bluetooth()));
+                    break;
+            }
+            
         }
         private void hook_Test_Insulator()
         {
-            esp32_module.WriteLine("Insulator_Test\n");
-            receive_present_state = ReportReceive_states.Req_Insul;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("Insulator_Test\n");
+                    receive_present_state = ReportReceive_states.Req_Insul;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("Insulator_Test\n");
+
+                    read_result_Insulator(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
+                    break;
+            }
+            
         }
         private void hook_Test_Diode()
         {
-            esp32_module.WriteLine("Diode_Test\n");
-            receive_present_state = ReportReceive_states.Req_Diode;
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("Diode_Test\n");
+                    receive_present_state = ReportReceive_states.Req_Diode;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("Diode_Test\n");
+
+                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
+                    break;
+            }
+            
         }
-        
+
 
         private void exp_dir_Click(object sender, EventArgs e)
         {
@@ -1146,7 +1263,8 @@ namespace EV_Testing_report_DEMO
             hook_Test_AB();
             scan_read = true;
             // Lock all Test button
-            Enable_All_Test_BTN(false);
+            if(commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
         }
 
         private void COM_Input_Enter(object sender, KeyPressEventArgs e)
@@ -2129,6 +2247,162 @@ Package_req = "State_B_to_C"
             doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.pdf");
             doc.Close();
         }
+
+        private void onDropdown(object sender, EventArgs e)
+        {
+            scanBluetooth();
+        }
+
+        private void scanBluetooth()
+        {
+            Bluetooth_Devices_List.Items.Clear();
+            // Scan Bluetooth
+            devices = client.DiscoverDevicesInRange();
+
+            foreach (BluetoothDeviceInfo deviceI in devices)
+            {
+                Bluetooth_Devices_List.Items.Add(deviceI.DeviceName);
+            }
+        }
+
+        private void onsel_Bluetooth(object sender, EventArgs e)
+        {
+            //indx_sel.Text = Bluetooth_Devices_List.SelectedIndex.ToString();
+            try
+            {
+                Selected_Device = devices[Bluetooth_Devices_List.SelectedIndex];
+                Bluetooth_Connect.Enabled = true;
+                Bluetooth_Devices_List.Text = Selected_Device.DeviceName;
+            }catch(IndexOutOfRangeException ex)
+            {
+
+            }
+            
+        }
+
+        private void Bluetooth_Connect_Click(object sender, EventArgs e)
+        {
+            if (!bluetooth_connecting)
+            {
+                try
+                {
+                    Bluetooth_Devices_List.Enabled = false;
+                    Bluetooth_Connect.Text = "Connecting...";
+                }
+                catch (Exception)
+                {
+
+                }
+                finally
+                {
+                    try
+                    {
+                        BluetoothEndPoint endPoint = new BluetoothEndPoint(Selected_Device.DeviceAddress, BluetoothService.SerialPort);
+                        client.Connect(endPoint);
+                        bluetoothStream = client.GetStream();
+                        bluetoothStream.ReadTimeout = 30000; // set read timeout to 5 sec
+
+                        bluetooth_connecting = true;
+                        Bluetooth_Connect.Text = "Disconnect";
+
+                        COM_Input.Enabled = false;
+                        Connect_ESP_BTN.Enabled = false;
+
+                        commu_mode = EVSE_Tester_CommunicationMode.Bluetooth;
+                        updateESP32_Connection_Status(true);
+                        isESP_connected = true;
+
+
+
+                    }
+                    catch (Exception)
+                    {
+                        Bluetooth_Connect.Text = "Connect";
+                        Bluetooth_Devices_List.Enabled = true;
+                        updateESP32_Connection_Status(false);
+                        isESP_connected = false;
+                        COM_Input.Enabled = true;
+                        Connect_ESP_BTN.Enabled = true;
+
+                        commu_mode = EVSE_Tester_CommunicationMode.None;
+                    }
+                }
+            }
+            else
+            {
+                Bluetooth_Connect.Text = "Connect";
+                Bluetooth_Devices_List.Enabled = true;
+                client.Close();
+                bluetoothStream.Close();
+                
+
+                client = new BluetoothClient();
+                bluetoothStream = null;
+
+                bluetooth_connecting = false;
+                updateESP32_Connection_Status(false);
+                isESP_connected = false;
+                COM_Input.Enabled = true;
+                Connect_ESP_BTN.Enabled = true;
+                commu_mode = EVSE_Tester_CommunicationMode.None;
+            }
+
+
+
+        }
+        
+        private void TestBluetooth_Click(object sender, EventArgs e)
+        {
+            if (bluetoothStream.CanWrite)
+            {
+                string message = "Hello, Bluetooth!";
+                byte[] messageBuffer = Encoding.ASCII.GetBytes(message);
+                bluetoothStream.Write(messageBuffer, 0, messageBuffer.Length);
+                
+                byte[] receiveBuffer = new byte[512];
+                bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                TestBluetoothTxt.Text = Encoding.ASCII.GetString(receiveBuffer);
+            }
+        }
+
+        private void send_Bluetooth(string str)
+        {
+            byte[] msg = Encoding.ASCII.GetBytes(str);
+            bluetoothStream.Write(msg, 0, msg.Length);
+            bluetoothStream.Flush();
+        }
+        private string receive_Bluetooth()
+        {
+            string indata = "";
+            int rem_;
+            char lastCh;
+            bool endJson = false;
+            do
+            {
+                rem_ = bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                lastCh = (char)receiveBuffer[rem_ - 1];
+                if(lastCh == '}')
+                {
+                    endJson = true;
+                }
+                else
+                {
+                    for(UInt32 i = 0;i < rem_; i++)
+                    {
+                        if ((char)receiveBuffer[i] == '}')
+                        {
+                            endJson = true;
+                            break;
+                        }
+                    }
+                }
+                indata += Encoding.ASCII.GetString(receiveBuffer, 0, rem_);
+            } while (!endJson);
+            
+            
+            addTextToSerialMon(indata);
+            return indata;
+        }
     }
 
     public class Request_Testing_Result
@@ -2201,5 +2475,11 @@ Package_req = "State_B_to_C"
         Req_Diode
     }
 
+    enum EVSE_Tester_CommunicationMode
+    {
+        None = 0,
+        SerialPort = 1,
+        Bluetooth = 2
+    }
 
 }
