@@ -102,7 +102,7 @@
             Test_BC = new Button();
             Test_CB = new Button();
             Test_RCD = new Button();
-            Test_Insulat = new Button();
+            Test_InsulatLine = new Button();
             Test_diode = new Button();
             AB_check = new Label();
             BC_check = new Label();
@@ -226,6 +226,12 @@
             Bluetooth_Devices_List = new ComboBox();
             TestBluetooth = new Button();
             TestBluetoothTxt = new Label();
+            INJ_readCP = new Button();
+            INJ_readPP = new Button();
+            INJ_readINS = new Button();
+            Test_PE_open = new Button();
+            Test_diode_open = new Button();
+            Test_InsulatNeut = new Button();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -351,6 +357,7 @@
             label8.Size = new Size(115, 15);
             label8.TabIndex = 11;
             label8.Text = "PWM Startup Delay :";
+            label8.Visible = false;
             // 
             // label9
             // 
@@ -398,7 +405,7 @@
             label13.Location = new Point(16, 218);
             label13.Margin = new Padding(2, 0, 2, 0);
             label13.Name = "label13";
-            label13.Size = new Size(71, 15);
+            label13.Size = new Size(70, 15);
             label13.TabIndex = 16;
             label13.Text = "PWM Imax :";
             // 
@@ -408,7 +415,7 @@
             label14.Location = new Point(16, 356);
             label14.Margin = new Padding(2, 0, 2, 0);
             label14.Name = "label14";
-            label14.Size = new Size(104, 15);
+            label14.Size = new Size(103, 15);
             label14.TabIndex = 22;
             label14.Text = "PWM Imax [<PP] :";
             // 
@@ -461,6 +468,7 @@
             label19.Size = new Size(115, 15);
             label19.TabIndex = 17;
             label19.Text = "PWM Startup Delay :";
+            label19.Visible = false;
             // 
             // label20
             // 
@@ -468,7 +476,7 @@
             label20.Location = new Point(320, 219);
             label20.Margin = new Padding(2, 0, 2, 0);
             label20.Name = "label20";
-            label20.Size = new Size(71, 15);
+            label20.Size = new Size(70, 15);
             label20.TabIndex = 28;
             label20.Text = "PWM Imax :";
             // 
@@ -521,6 +529,7 @@
             label25.Size = new Size(115, 15);
             label25.TabIndex = 23;
             label25.Text = "PWM Startup Delay :";
+            label25.Visible = false;
             // 
             // label26
             // 
@@ -609,7 +618,7 @@
             label34.Location = new Point(628, 274);
             label34.Margin = new Padding(2, 0, 2, 0);
             label34.Name = "label34";
-            label34.Size = new Size(61, 15);
+            label34.Size = new Size(63, 15);
             label34.TabIndex = 36;
             label34.Text = "Trip Time :";
             // 
@@ -663,6 +672,7 @@
             AB_PWM_Startup.Size = new Size(12, 15);
             AB_PWM_Startup.TabIndex = 43;
             AB_PWM_Startup.Text = "-";
+            AB_PWM_Startup.Visible = false;
             // 
             // AB_PWM_Amp
             // 
@@ -773,6 +783,7 @@
             CB_PWM_Startup.Size = new Size(12, 15);
             CB_PWM_Startup.TabIndex = 49;
             CB_PWM_Startup.Text = "-";
+            CB_PWM_Startup.Visible = false;
             // 
             // BC_PWM_Imax
             // 
@@ -833,6 +844,7 @@
             BC_PWM_Startup.Size = new Size(12, 15);
             BC_PWM_Startup.TabIndex = 55;
             BC_PWM_Startup.Text = "-";
+            BC_PWM_Startup.Visible = false;
             // 
             // BC_PWM_MainFreq
             // 
@@ -987,15 +999,15 @@
             Test_RCD.UseVisualStyleBackColor = true;
             Test_RCD.Click += Test_RCD_Click;
             // 
-            // Test_Insulat
+            // Test_InsulatLine
             // 
-            Test_Insulat.Location = new Point(898, 325);
-            Test_Insulat.Name = "Test_Insulat";
-            Test_Insulat.Size = new Size(75, 23);
-            Test_Insulat.TabIndex = 76;
-            Test_Insulat.Text = "Test";
-            Test_Insulat.UseVisualStyleBackColor = true;
-            Test_Insulat.Click += Test_Insulat_Click;
+            Test_InsulatLine.Location = new Point(896, 344);
+            Test_InsulatLine.Name = "Test_InsulatLine";
+            Test_InsulatLine.Size = new Size(75, 23);
+            Test_InsulatLine.TabIndex = 76;
+            Test_InsulatLine.Text = "Test";
+            Test_InsulatLine.UseVisualStyleBackColor = true;
+            Test_InsulatLine.Click += TestL_PE_Click;
             // 
             // Test_diode
             // 
@@ -1220,6 +1232,7 @@
             BD_PWM_OnDel.Size = new Size(12, 15);
             BD_PWM_OnDel.TabIndex = 108;
             BD_PWM_OnDel.Text = "-";
+            BD_PWM_OnDel.Visible = false;
             // 
             // BD_PWM_Imax
             // 
@@ -1280,6 +1293,7 @@
             BD_PWM_Startup.Size = new Size(12, 15);
             BD_PWM_Startup.TabIndex = 102;
             BD_PWM_Startup.Text = "-";
+            BD_PWM_Startup.Visible = false;
             // 
             // label52
             // 
@@ -1300,6 +1314,7 @@
             label53.Size = new Size(96, 15);
             label53.TabIndex = 100;
             label53.Text = "Mains On Delay :";
+            label53.Visible = false;
             // 
             // label54
             // 
@@ -1307,7 +1322,7 @@
             label54.Location = new Point(320, 356);
             label54.Margin = new Padding(2, 0, 2, 0);
             label54.Name = "label54";
-            label54.Size = new Size(71, 15);
+            label54.Size = new Size(70, 15);
             label54.TabIndex = 99;
             label54.Text = "PWM Imax :";
             // 
@@ -1360,6 +1375,7 @@
             label59.Size = new Size(115, 15);
             label59.TabIndex = 94;
             label59.Text = "PWM Startup Delay :";
+            label59.Visible = false;
             // 
             // label60
             // 
@@ -1474,7 +1490,7 @@
             label43.AutoSize = true;
             label43.Location = new Point(538, 451);
             label43.Name = "label43";
-            label43.Size = new Size(61, 15);
+            label43.Size = new Size(62, 15);
             label43.TabIndex = 123;
             label43.Text = "Template :";
             // 
@@ -1483,7 +1499,7 @@
             label45.AutoSize = true;
             label45.Location = new Point(501, 466);
             label45.Name = "label45";
-            label45.Size = new Size(98, 15);
+            label45.Size = new Size(97, 15);
             label45.TabIndex = 124;
             label45.Text = "Export Directory :";
             // 
@@ -1583,6 +1599,7 @@
             AB_PWM_Startup_Result.Size = new Size(12, 15);
             AB_PWM_Startup_Result.TabIndex = 43;
             AB_PWM_Startup_Result.Text = "-";
+            AB_PWM_Startup_Result.Visible = false;
             // 
             // AB_PWM_Amp_Result
             // 
@@ -1643,6 +1660,7 @@
             BC_PWM_Startup_Result.Size = new Size(12, 15);
             BC_PWM_Startup_Result.TabIndex = 55;
             BC_PWM_Startup_Result.Text = "-";
+            BC_PWM_Startup_Result.Visible = false;
             // 
             // BC_PWM_Amp_Result
             // 
@@ -1923,7 +1941,7 @@
             label62.AutoSize = true;
             label62.Location = new Point(6, 41);
             label62.Name = "label62";
-            label62.Size = new Size(37, 15);
+            label62.Size = new Size(38, 15);
             label62.TabIndex = 138;
             label62.Text = "Type :";
             // 
@@ -1943,6 +1961,7 @@
             CB_PWM_Startup_Result.Size = new Size(12, 15);
             CB_PWM_Startup_Result.TabIndex = 49;
             CB_PWM_Startup_Result.Text = "-";
+            CB_PWM_Startup_Result.Visible = false;
             // 
             // CB_PWM_Amp_Result
             // 
@@ -2013,6 +2032,7 @@
             BD_PWM_Startup_Result.Size = new Size(12, 15);
             BD_PWM_Startup_Result.TabIndex = 102;
             BD_PWM_Startup_Result.Text = "-";
+            BD_PWM_Startup_Result.Visible = false;
             // 
             // BD_PWM_Amp_Result
             // 
@@ -2073,6 +2093,7 @@
             BD_PWM_OnDel_Result.Size = new Size(12, 15);
             BD_PWM_OnDel_Result.TabIndex = 108;
             BD_PWM_OnDel_Result.Text = "-";
+            BD_PWM_OnDel_Result.Visible = false;
             // 
             // BD_PWM_MainFreq_Result
             // 
@@ -2191,12 +2212,80 @@
             TestBluetoothTxt.Text = "label69";
             TestBluetoothTxt.Visible = false;
             // 
+            // INJ_readCP
+            // 
+            INJ_readCP.Location = new Point(504, 488);
+            INJ_readCP.Name = "INJ_readCP";
+            INJ_readCP.Size = new Size(75, 23);
+            INJ_readCP.TabIndex = 139;
+            INJ_readCP.Text = "R CP";
+            INJ_readCP.UseVisualStyleBackColor = true;
+            INJ_readCP.Visible = false;
+            INJ_readCP.Click += INJ_readCP_Click;
+            // 
+            // INJ_readPP
+            // 
+            INJ_readPP.Location = new Point(504, 512);
+            INJ_readPP.Name = "INJ_readPP";
+            INJ_readPP.Size = new Size(75, 23);
+            INJ_readPP.TabIndex = 140;
+            INJ_readPP.Text = "R PP";
+            INJ_readPP.UseVisualStyleBackColor = true;
+            INJ_readPP.Visible = false;
+            INJ_readPP.Click += INJ_readPP_Click;
+            // 
+            // INJ_readINS
+            // 
+            INJ_readINS.Location = new Point(504, 536);
+            INJ_readINS.Name = "INJ_readINS";
+            INJ_readINS.Size = new Size(75, 23);
+            INJ_readINS.TabIndex = 141;
+            INJ_readINS.Text = "R INS";
+            INJ_readINS.UseVisualStyleBackColor = true;
+            INJ_readINS.Visible = false;
+            INJ_readINS.Click += INJ_readINS_Click;
+            // 
+            // Test_PE_open
+            // 
+            Test_PE_open.Location = new Point(896, 168);
+            Test_PE_open.Name = "Test_PE_open";
+            Test_PE_open.Size = new Size(75, 23);
+            Test_PE_open.TabIndex = 142;
+            Test_PE_open.Text = "Test";
+            Test_PE_open.UseVisualStyleBackColor = true;
+            Test_PE_open.Click += Test_PE_open_Click;
+            // 
+            // Test_diode_open
+            // 
+            Test_diode_open.Location = new Point(896, 216);
+            Test_diode_open.Name = "Test_diode_open";
+            Test_diode_open.Size = new Size(75, 23);
+            Test_diode_open.TabIndex = 142;
+            Test_diode_open.Text = "Test";
+            Test_diode_open.UseVisualStyleBackColor = true;
+            Test_diode_open.Click += Test_diode_open_Click;
+            // 
+            // Test_InsulatNeut
+            // 
+            Test_InsulatNeut.Location = new Point(896, 368);
+            Test_InsulatNeut.Name = "Test_InsulatNeut";
+            Test_InsulatNeut.Size = new Size(75, 23);
+            Test_InsulatNeut.TabIndex = 76;
+            Test_InsulatNeut.Text = "Test";
+            Test_InsulatNeut.UseVisualStyleBackColor = true;
+            Test_InsulatNeut.Click += TestN_PE_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1301, 590);
+            Controls.Add(Test_diode_open);
+            Controls.Add(Test_PE_open);
+            Controls.Add(INJ_readINS);
+            Controls.Add(INJ_readPP);
+            Controls.Add(INJ_readCP);
             Controls.Add(TestBluetoothTxt);
             Controls.Add(TestBluetooth);
             Controls.Add(tabControl2);
@@ -2264,7 +2353,8 @@
             Controls.Add(BC_check);
             Controls.Add(AB_check);
             Controls.Add(Test_diode);
-            Controls.Add(Test_Insulat);
+            Controls.Add(Test_InsulatNeut);
+            Controls.Add(Test_InsulatLine);
             Controls.Add(Test_RCD);
             Controls.Add(Test_CB);
             Controls.Add(Test_BC);
@@ -2449,7 +2539,7 @@
         private Button Test_BC;
         private Button Test_CB;
         private Button Test_RCD;
-        private Button Test_Insulat;
+        private Button Test_InsulatLine;
         private Button Test_diode;
         private Label AB_check;
         private Label BC_check;
@@ -2573,5 +2663,11 @@
         private Button Bluetooth_Connect;
         private Button TestBluetooth;
         private Label TestBluetoothTxt;
+        private Button INJ_readCP;
+        private Button INJ_readPP;
+        private Button INJ_readINS;
+        private Button Test_PE_open;
+        private Button Test_diode_open;
+        private Button Test_InsulatNeut;
     }
 }

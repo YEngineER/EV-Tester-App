@@ -40,7 +40,7 @@ namespace EV_Testing_report_DEMO
         bool isTemplateSelected = false;
 
         EVSE_Tester_CommunicationMode commu_mode = EVSE_Tester_CommunicationMode.None;
-
+        Diode_Test_ENUM diode_TestCMD = Diode_Test_ENUM.notTesting;
 
         // Create new bluetooth device object
         BluetoothClient client;
@@ -173,8 +173,11 @@ namespace EV_Testing_report_DEMO
                 Test_BD.Enabled = sts;
                 Test_RCD.Enabled = sts;
                 Test_diode.Enabled = sts;
-                Test_Insulat.Enabled = sts;
+                Test_InsulatLine.Enabled = sts;
+                Test_InsulatNeut.Enabled = sts;
                 Test_ALL_BTN.Enabled = sts;
+                Test_PE_open.Enabled = sts;
+                Test_diode_open.Enabled= sts;
                 cancelBTN.Enabled = !sts && isESP_connected;
                 update_btn_Text();
             }
@@ -198,7 +201,7 @@ namespace EV_Testing_report_DEMO
                         Test_BD.Text = "Test";
                         Test_RCD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_AB:
                         Test_AB.Text = "Testing...";
@@ -207,7 +210,7 @@ namespace EV_Testing_report_DEMO
                         Test_BD.Text = "Test";
                         Test_RCD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_BC:
                         Test_BC.Text = "Testing...";
@@ -216,7 +219,7 @@ namespace EV_Testing_report_DEMO
                         Test_BD.Text = "Test";
                         Test_RCD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_CB:
                         Test_CB.Text = "Testing...";
@@ -225,7 +228,7 @@ namespace EV_Testing_report_DEMO
                         Test_BD.Text = "Test";
                         Test_RCD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_BD:
                         Test_BD.Text = "Testing...";
@@ -234,7 +237,7 @@ namespace EV_Testing_report_DEMO
                         Test_CB.Text = "Test";
                         Test_RCD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_Diode:
                         Test_diode.Text = "Testing...";
@@ -243,7 +246,7 @@ namespace EV_Testing_report_DEMO
                         Test_CB.Text = "Test";
                         Test_BD.Text = "Test";
                         Test_RCD.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_RCD:
                         Test_RCD.Text = "Testing...";
@@ -252,10 +255,10 @@ namespace EV_Testing_report_DEMO
                         Test_CB.Text = "Test";
                         Test_BD.Text = "Test";
                         Test_diode.Text = "Test";
-                        Test_Insulat.Text = "Test";
+                        Test_InsulatLine.Text = "Test";
                         break;
                     case ReportReceive_states.Req_Insul:
-                        Test_Insulat.Text = "Testing...";
+                        Test_InsulatLine.Text = "Testing...";
                         Test_AB.Text = "Test";
                         Test_BC.Text = "Test";
                         Test_CB.Text = "Test";
@@ -959,41 +962,60 @@ namespace EV_Testing_report_DEMO
             }
             else
             {
-                DiodeShort_Delay.Text = result_diode_test.Diode_ShortCircuit_MainsOffDelay + " ms";
-            }
-            PE_Open_Delay.Text = result_diode_test.PE_OpenCircuit_MainsOffDelay + " ms";
-            DiodeOpen_Delay.Text = result_diode_test.Diode_OpenCircuit_MainsOffDelay + " ms";
 
-            if (result_diode_test.Diode_ShortCircuit_Result)
-            {
-                Diode_Short_check.Text = "Pass";
-                Diode_Short_check.ForeColor = Color.Green;
+                if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Short)
+                {
+                    diode_TestCMD = Diode_Test_ENUM.notTesting;
+                    DiodeShort_Delay.Text = result_diode_test.Diode_ShortCircuit_MainsOffDelay + " ms";
+                    if (result_diode_test.Diode_ShortCircuit_Result)
+                    {
+                        Diode_Short_check.Text = "Pass";
+                        Diode_Short_check.ForeColor = Color.Green;
+                    }
+                    else
+                    {
+                        Diode_Short_check.Text = "Fail";
+                        Diode_Short_check.ForeColor = Color.Red;
+                    }
+                }
+
+
             }
-            else
+
+            if (diode_TestCMD == Diode_Test_ENUM.TestPE_Open)
             {
-                Diode_Short_check.Text = "Fail";
-                Diode_Short_check.ForeColor = Color.Red;
+                diode_TestCMD = Diode_Test_ENUM.notTesting;
+                PE_Open_Delay.Text = result_diode_test.PE_OpenCircuit_MainsOffDelay + " ms";
+                if (result_diode_test.PE_OpenCircuit_Result)
+                {
+                    PE_Open_check.Text = "Pass";
+                    PE_Open_check.ForeColor = Color.Green;
+                }
+                else
+                {
+                    PE_Open_check.Text = "Fail";
+                    PE_Open_check.ForeColor = Color.Red;
+                }
             }
-            if (result_diode_test.PE_OpenCircuit_Result)
+            if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Open)
             {
-                PE_Open_check.Text = "Pass";
-                PE_Open_check.ForeColor = Color.Green;
+                diode_TestCMD = Diode_Test_ENUM.notTesting;
+                DiodeOpen_Delay.Text = result_diode_test.Diode_OpenCircuit_MainsOffDelay + " ms";
+                if (result_diode_test.Diode_OpenCircuit_Result)
+                {
+                    DiodeOpen_check.Text = "Pass";
+                    DiodeOpen_check.ForeColor = Color.Green;
+                }
+                else
+                {
+                    DiodeOpen_check.Text = "Fail";
+                    DiodeOpen_check.ForeColor = Color.Red;
+                }
             }
-            else
-            {
-                PE_Open_check.Text = "Fail";
-                PE_Open_check.ForeColor = Color.Red;
-            }
-            if (result_diode_test.Diode_OpenCircuit_Result)
-            {
-                DiodeOpen_check.Text = "Pass";
-                DiodeOpen_check.ForeColor = Color.Green;
-            }
-            else
-            {
-                DiodeOpen_check.Text = "Fail";
-                DiodeOpen_check.ForeColor = Color.Red;
-            }
+
+
+
+
         }
         void read_result_Insulator(Insulation_Test s_insu)
         {
@@ -1026,6 +1048,66 @@ namespace EV_Testing_report_DEMO
                 Insu_check.ForeColor = Color.Red;
             }
 
+        }
+
+        void read_result_LinePE(Insulation_Test s_insu)
+        {
+            Insulation_Test = s_insu;
+
+            if (Insulator_Limit.InvokeRequired)
+            {
+                Action add_str = delegate
+                {
+                    read_result_Insulator(s_insu);
+                };
+                Insulator_Limit.Invoke(add_str);
+            }
+            else
+            {
+                Insulator_Result.Text = Insulation_Test.L_PE + " Ω";
+            }
+            
+            Insulator_Volt.Text = Insulation_Test.Voltage + " V";
+
+            if (Insulation_Test.Insulation_Testing)
+            {
+                Insu_check.Text = "Pass";
+                Insu_check.ForeColor = Color.Green;
+            }
+            else
+            {
+                Insu_check.Text = "Fail";
+                Insu_check.ForeColor = Color.Red;
+            }
+        }
+        void read_result_NeutPE(Insulation_Test s_insu)
+        {
+            Insulation_Test = s_insu;
+
+            if (Insulator_Limit.InvokeRequired)
+            {
+                Action add_str = delegate
+                {
+                    read_result_Insulator(s_insu);
+                };
+                Insulator_Limit.Invoke(add_str);
+            }
+            else
+            {
+                Insulator_Limit.Text = Insulation_Test.N_PE + " Ω";
+            }
+            Insulator_Volt.Text = Insulation_Test.Voltage + " V";
+
+            if (Insulation_Test.Insulation_Testing)
+            {
+                Insu_check.Text = "Pass";
+                Insu_check.ForeColor = Color.Green;
+            }
+            else
+            {
+                Insu_check.Text = "Fail";
+                Insu_check.ForeColor = Color.Red;
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -1107,7 +1189,37 @@ namespace EV_Testing_report_DEMO
 
         private void button1_Click(object sender, EventArgs e)
         {
+            diode_TestCMD = Diode_Test_ENUM.TestDiode_Short;
             hook_Test_Diode();
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
+        }
+
+        private void Test_PE_open_Click(object sender, EventArgs e)
+        {
+            diode_TestCMD = Diode_Test_ENUM.TestPE_Open;
+            hook_Test_PE_Open();
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
+        }
+
+        private void Test_diode_open_Click(object sender, EventArgs e)
+        {
+            diode_TestCMD = Diode_Test_ENUM.TestDiode_Open;
+            hook_Test_DiodeOpen();
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
+        }
+        private void TestL_PE_Click(object sender, EventArgs e)
+        {
+            hook_Test_LinePE();
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+                Enable_All_Test_BTN(false);
+        }
+
+        private void TestN_PE_Click(object sender, EventArgs e)
+        {
+            hook_Test_NeutPE();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
@@ -1127,7 +1239,7 @@ namespace EV_Testing_report_DEMO
 
                     read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
                     hook_Test_BC();
-                    break;  
+                    break;
             }
         }
         private void hook_Test_BC()
@@ -1146,7 +1258,7 @@ namespace EV_Testing_report_DEMO
                     hook_Test_BD();
                     break;
             }
-            
+
         }
         private void hook_Test_CB()
         {
@@ -1166,7 +1278,7 @@ namespace EV_Testing_report_DEMO
                     scan_read = false;
                     break;
             }
-            
+
         }
         private void hook_Test_BD()
         {
@@ -1184,7 +1296,7 @@ namespace EV_Testing_report_DEMO
                     hook_Test_CB();
                     break;
             }
-            
+
         }
         private void hook_Test_RCD()
         {
@@ -1202,7 +1314,7 @@ namespace EV_Testing_report_DEMO
                     read_result_RCD(JsonSerializer.Deserialize<RCD0>(receive_Bluetooth()));
                     break;
             }
-            
+
         }
         private void hook_Test_Insulator()
         {
@@ -1220,7 +1332,41 @@ namespace EV_Testing_report_DEMO
                     read_result_Insulator(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
                     break;
             }
-            
+
+        }
+        private void hook_Test_LinePE()
+        {
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("Test_LinePE\n");
+                    receive_present_state = ReportReceive_states.Req_Insul;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("Test_LinePE\n");
+
+                    read_result_LinePE(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
+                    break;
+            }
+        }
+        private void hook_Test_NeutPE()
+        {
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("Test_NeutralPE\n");
+                    receive_present_state = ReportReceive_states.Req_Insul;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("Test_NeutralPE\n");
+
+                    read_result_NeutPE(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
+                    break;
+            }
         }
         private void hook_Test_Diode()
         {
@@ -1238,7 +1384,46 @@ namespace EV_Testing_report_DEMO
                     read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
                     break;
             }
-            
+
+        }
+
+        private void hook_Test_PE_Open()
+        {
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("PE_Open_Test\n");
+                    receive_present_state = ReportReceive_states.Req_Diode;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("PE_Open_Test\n");
+
+                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
+                    break;
+            }
+
+        }
+
+        private void hook_Test_DiodeOpen()
+        {
+            switch (commu_mode)
+            {
+                case EVSE_Tester_CommunicationMode.None:
+                    break;
+                case EVSE_Tester_CommunicationMode.SerialPort:
+                    esp32_module.WriteLine("Diode_Open_Test\n");
+                    receive_present_state = ReportReceive_states.Req_Diode;
+                    break;
+                case EVSE_Tester_CommunicationMode.Bluetooth:
+                    send_Bluetooth("Diode_Open_Test\n");
+
+                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
+                    break;
+            }
+
+
         }
 
 
@@ -1263,7 +1448,7 @@ namespace EV_Testing_report_DEMO
             hook_Test_AB();
             scan_read = true;
             // Lock all Test button
-            if(commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
+            if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
@@ -2273,11 +2458,12 @@ Package_req = "State_B_to_C"
                 Selected_Device = devices[Bluetooth_Devices_List.SelectedIndex];
                 Bluetooth_Connect.Enabled = true;
                 Bluetooth_Devices_List.Text = Selected_Device.DeviceName;
-            }catch(IndexOutOfRangeException ex)
+            }
+            catch (IndexOutOfRangeException ex)
             {
 
             }
-            
+
         }
 
         private void Bluetooth_Connect_Click(object sender, EventArgs e)
@@ -2334,7 +2520,7 @@ Package_req = "State_B_to_C"
                 Bluetooth_Devices_List.Enabled = true;
                 client.Close();
                 bluetoothStream.Close();
-                
+
 
                 client = new BluetoothClient();
                 bluetoothStream = null;
@@ -2350,7 +2536,7 @@ Package_req = "State_B_to_C"
 
 
         }
-        
+
         private void TestBluetooth_Click(object sender, EventArgs e)
         {
             if (bluetoothStream.CanWrite)
@@ -2358,7 +2544,7 @@ Package_req = "State_B_to_C"
                 string message = "Hello, Bluetooth!";
                 byte[] messageBuffer = Encoding.ASCII.GetBytes(message);
                 bluetoothStream.Write(messageBuffer, 0, messageBuffer.Length);
-                
+
                 byte[] receiveBuffer = new byte[512];
                 bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
                 TestBluetoothTxt.Text = Encoding.ASCII.GetString(receiveBuffer);
@@ -2379,30 +2565,63 @@ Package_req = "State_B_to_C"
             bool endJson = false;
             do
             {
-                rem_ = bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
-                lastCh = (char)receiveBuffer[rem_ - 1];
-                if(lastCh == '}')
+                try
                 {
-                    endJson = true;
-                }
-                else
-                {
-                    for(UInt32 i = 0;i < rem_; i++)
+                    rem_ = bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                    if (rem_ != 0)
                     {
-                        if ((char)receiveBuffer[i] == '}')
+                        lastCh = (char)receiveBuffer[rem_ - 1];
+                        if (lastCh == '}')
                         {
                             endJson = true;
-                            break;
                         }
+                        else
+                        {
+                            for (UInt32 i = 0; i < rem_; i++)
+                            {
+                                if ((char)receiveBuffer[i] == '}')
+                                {
+                                    endJson = true;
+                                    break;
+                                }
+                            }
+                        }
+                        indata += Encoding.ASCII.GetString(receiveBuffer, 0, rem_);
+                    }
+                    else
+                    {
+                        endJson = true;
                     }
                 }
-                indata += Encoding.ASCII.GetString(receiveBuffer, 0, rem_);
+                catch (IOException e)
+                {
+
+                }
+
+
             } while (!endJson);
-            
-            
+
+
             addTextToSerialMon(indata);
             return indata;
         }
+
+        private void INJ_readCP_Click(object sender, EventArgs e)
+        {
+            send_Bluetooth("read_CP\n");
+        }
+
+        private void INJ_readPP_Click(object sender, EventArgs e)
+        {
+            send_Bluetooth("read_PP\n");
+        }
+
+        private void INJ_readINS_Click(object sender, EventArgs e)
+        {
+            send_Bluetooth("read_INS\n");
+        }
+
+        
     }
 
     public class Request_Testing_Result
@@ -2482,4 +2701,10 @@ Package_req = "State_B_to_C"
         Bluetooth = 2
     }
 
+    enum Diode_Test_ENUM { 
+        notTesting,
+        TestDiode_Short,
+        TestPE_Open,
+        TestDiode_Open
+    }
 }
