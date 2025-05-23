@@ -42,6 +42,8 @@ namespace EV_Testing_report_DEMO
         EVSE_Tester_CommunicationMode commu_mode = EVSE_Tester_CommunicationMode.None;
         Diode_Test_ENUM diode_TestCMD = Diode_Test_ENUM.notTesting;
 
+        EVSE_Manual_State manual_State = EVSE_Manual_State.EV_State_A;
+
         // Create new bluetooth device object
         BluetoothClient client;
         BluetoothDeviceInfo[] devices;
@@ -50,6 +52,7 @@ namespace EV_Testing_report_DEMO
 
         Stream bluetoothStream;
         byte[] receiveBuffer = new byte[512];
+
 
         public Form1()
         {
@@ -177,7 +180,7 @@ namespace EV_Testing_report_DEMO
                 Test_InsulatNeut.Enabled = sts;
                 Test_ALL_BTN.Enabled = sts;
                 Test_PE_open.Enabled = sts;
-                Test_diode_open.Enabled= sts;
+                Test_diode_open.Enabled = sts;
                 cancelBTN.Enabled = !sts && isESP_connected;
                 update_btn_Text();
             }
@@ -437,6 +440,8 @@ namespace EV_Testing_report_DEMO
             AB_PWM_Duty.Text = result_State_A_to_B.PWM_DutyCycle + " %";
             AB_PWM_Imax.Text = result_State_A_to_B.PWM_Imax + " A";
 
+            
+
             if (result_State_A_to_B.PWM_StartupDelay_Result)
             {
                 AB_PWM_Startup_Result.Text = "Pass";
@@ -497,6 +502,26 @@ namespace EV_Testing_report_DEMO
                 AB_PWM_Imax_Result.Text = "Fail";
                 AB_PWM_Imax_Result.ForeColor = Color.Red;
             }
+
+            // front page
+            B_PWM_Pk.Text       = AB_PWM_Amp.Text;
+            B_PWM_nPk.Text      = AB_PWM_NVE.Text;
+            B_PWM_Freq.Text     = AB_PWM_Freq.Text;
+            B_PWM_Duty.Text     = AB_PWM_Duty.Text;
+            B_PWM_Imax.Text     = AB_PWM_Imax.Text;
+
+            B_PWM_Imax_sts.Text = AB_PWM_Imax_Result.Text;
+            B_PWM_Pk_sts.Text   = AB_PWM_Amp_Result.Text;
+            B_PWM_nPk_sts.Text  = AB_PWM_NVE_Result.Text;
+            B_PWM_Freq_sts.Text = AB_PWM_Freq_Result.Text;
+            B_PWM_Duty_sts.Text = AB_PWM_Duty_Result.Text;
+
+            B_PWM_Imax_sts.ForeColor    = AB_PWM_Imax_Result.ForeColor;
+            B_PWM_Pk_sts.ForeColor      = AB_PWM_Amp_Result.ForeColor;
+            B_PWM_nPk_sts.ForeColor     = AB_PWM_NVE_Result.ForeColor;
+            B_PWM_Freq_sts.ForeColor    = AB_PWM_Freq_Result.ForeColor;
+            B_PWM_Duty_sts.ForeColor    = AB_PWM_Duty_Result.ForeColor;
+
 
             /*
             if (result_State_A_to_B.Testing_Result)
@@ -650,6 +675,37 @@ namespace EV_Testing_report_DEMO
                 BC_PP_Result.ForeColor = Color.Red;
             }
 
+            // Front page
+            BC_MainOn.Text = BC_PWM_OnDel.Text;
+            BC_MainOn_sts.Text = BC_PWM_OnDel_Result.Text;
+            BC_MainOn_sts.ForeColor = BC_PWM_OnDel_Result.ForeColor;
+
+            C_PWM_Pk.Text = BC_PWM_Amp.Text;
+            C_PWM_nPk.Text = BC_PWM_NVE.Text;
+            C_PWM_Freq.Text = BC_PWM_Freq.Text;
+            C_PWM_Duty.Text = BC_PWM_Duty.Text;
+            C_PWM_Imax.Text = BC_PWM_Imax.Text;
+            C_PWM_MainVolt.Text = BC_Voltage.Text;
+            C_PWM_MainFreq.Text = BC_PWM_MainFreq.Text;
+            C_PWM_PP.Text = BC_PP.Text;
+
+            C_PWM_Pk_sts.Text = BC_PWM_Amp_Result.Text;
+            C_PWM_nPk_sts.Text = BC_PWM_NVE_Result.Text;
+            C_PWM_Freq_sts.Text = BC_PWM_Freq_Result.Text;
+            C_PWM_Duty_sts.Text = BC_PWM_Duty_Result.Text;
+            C_PWM_Imax_sts.Text = BC_PWM_Imax_Result.Text;
+            C_PWM_MainVolt_sts.Text = BC_Voltage_Result.Text;
+            C_PWM_MainFreq_sts.Text = BC_PWM_MainFreq_Result.Text;
+            C_PWM_PP_sts.Text = BC_PP_Result.Text;
+
+            C_PWM_Pk_sts.ForeColor = BC_PWM_Amp_Result.ForeColor;
+            C_PWM_nPk_sts.ForeColor = BC_PWM_NVE_Result.ForeColor;
+            C_PWM_Freq_sts.ForeColor = BC_PWM_Freq_Result.ForeColor;
+            C_PWM_Duty_sts.ForeColor = BC_PWM_Duty_Result.ForeColor;
+            C_PWM_Imax_sts.ForeColor = BC_PWM_Imax_Result.ForeColor;
+            C_PWM_MainVolt_sts.ForeColor = BC_Voltage_Result.ForeColor;
+            C_PWM_MainFreq_sts.ForeColor = BC_PWM_MainFreq_Result.ForeColor;
+            C_PWM_PP_sts.ForeColor = BC_PP_Result.ForeColor;
         }
         void read_result_C_to_B(State_Transition_Test s_C_B)
         {
@@ -744,6 +800,10 @@ namespace EV_Testing_report_DEMO
                 CB_PWM_OffDel_Result.Text = "Fail";
                 CB_PWM_OffDel_Result.ForeColor = Color.Red;
             }
+
+            CB_PWM_MainOff.Text = CB_PWM_OffDel.Text;
+            CB_PWM_MainOff_sts.Text = CB_PWM_OffDel_Result.Text;
+            CB_PWM_MainOff_sts.ForeColor = CB_PWM_OffDel_Result.ForeColor;
 
 
             // CB_PWM_Startup_Result
@@ -903,7 +963,33 @@ namespace EV_Testing_report_DEMO
                 BD_PP_Result.ForeColor = Color.Red;
             }
 
+            // Front page
+            
 
+            D_PWM_Pk.Text = BD_PWM_Amp.Text;
+            D_PWM_nPk.Text = BD_PWM_NVE.Text;
+            D_PWM_Freq.Text = BD_PWM_Freq.Text;
+            D_PWM_Duty.Text = BD_PWM_Duty.Text;
+            D_PWM_Imax.Text = BD_PWM_Imax.Text;
+            D_PWM_MainVolt.Text = BD_Voltage.Text;
+            D_PWM_MainFreq.Text = BD_PWM_MainFreq.Text;
+            D_PWM_PP.Text = BD_PP.Text;
+            D_PWM_Pk_sts.Text = BD_PWM_Amp_Result.Text;
+            D_PWM_nPk_sts.Text = BD_PWM_NVE_Result.Text;
+            D_PWM_Freq_sts.Text = BD_PWM_Freq_Result.Text;
+            D_PWM_Duty_sts.Text = BD_PWM_Duty_Result.Text;
+            D_PWM_Imax_sts.Text = BD_PWM_Imax_Result.Text;
+            D_PWM_MainVolt_sts.Text = BD_Voltage_Result.Text;
+            D_PWM_MainFreq_sts.Text = BD_PWM_MainFreq_Result.Text;
+            D_PWM_PP_sts.Text = BD_PP_Result.Text;
+            D_PWM_Pk_sts.ForeColor = BD_PWM_Amp_Result.ForeColor;
+            D_PWM_nPk_sts.ForeColor = BD_PWM_NVE_Result.ForeColor;
+            D_PWM_Freq_sts.ForeColor = BD_PWM_Freq_Result.ForeColor;
+            D_PWM_Duty_sts.ForeColor = BD_PWM_Duty_Result.ForeColor;
+            D_PWM_Imax_sts.ForeColor = BD_PWM_Imax_Result.ForeColor;
+            D_PWM_MainVolt_sts.ForeColor = BD_Voltage_Result.ForeColor;
+            D_PWM_MainFreq_sts.ForeColor = BD_PWM_MainFreq_Result.ForeColor;
+            D_PWM_PP_sts.ForeColor = BD_PP_Result.ForeColor;
             // BD_PWM_Startup_Result
             // BD_PWM_Amp_Result
             // BD_PWM_NVE_Result
@@ -946,6 +1032,15 @@ namespace EV_Testing_report_DEMO
                 RCD_check.Text = "Fail";
                 RCD_check.ForeColor = Color.Red;
             }
+
+            // Front Page
+            
+            RCD_TestingInjectedCurrent.Text = RCD_Current.Text;
+            RCD_Accecptable_TripTime.Text = RCD_Limit.Text;            
+            RCD_TripTime_ms.Text = RCD_TripTime.Text;
+            RCD_TripTime_ms_sts.Text = RCD_check.Text;
+            RCD_TripTime_ms_sts.ForeColor = RCD_check.ForeColor;
+
         }
         void read_result_Diode(Diode_Test s_diode)
         {
@@ -1013,7 +1108,18 @@ namespace EV_Testing_report_DEMO
                 }
             }
 
+            // Front Page
+            DiodeOpen_MainOff.Text = DiodeOpen_Delay.Text;
+            PE_Open_MainOff.Text = PE_Open_Delay.Text;
+            DiodeSh_MainOff.Text = DiodeShort_Delay.Text;
 
+            DiodeOpen_MainOff_sts.Text = DiodeOpen_check.Text;
+            PE_Open_MainOff_sts.Text = PE_Open_check.Text;
+            DiodeSh_MainOff_sts.Text = Diode_Short_check.Text;
+
+            DiodeOpen_MainOff_sts.ForeColor = DiodeOpen_check.ForeColor;
+            PE_Open_MainOff_sts.ForeColor = PE_Open_check.ForeColor;
+            DiodeSh_MainOff_sts.ForeColor = Diode_Short_check.ForeColor;
 
 
         }
@@ -1066,7 +1172,7 @@ namespace EV_Testing_report_DEMO
             {
                 Insulator_Result.Text = Insulation_Test.L_PE + " Ω";
             }
-            
+
             Insulator_Volt.Text = Insulation_Test.Voltage + " V";
 
             if (Insulation_Test.Insulation_Testing)
@@ -1151,24 +1257,31 @@ namespace EV_Testing_report_DEMO
 
         private void Test_AB_Click(object sender, EventArgs e)
         {
+            scan_read = false;
+
             hook_Test_AB();
             Enable_All_Test_BTN(false);
         }
 
         private void Test_BC_Click(object sender, EventArgs e)
         {
+            scan_read = false;
+
             hook_Test_BC();
             Enable_All_Test_BTN(false);
         }
 
         private void Test_CB_Click(object sender, EventArgs e)
         {
+            scan_read = false;
+
             hook_Test_CB();
             Enable_All_Test_BTN(false);
         }
 
         private void Test_BD_Click(object sender, EventArgs e)
         {
+            scan_read = false;
             hook_Test_BD();
             Enable_All_Test_BTN(false);
         }
@@ -1235,10 +1348,20 @@ namespace EV_Testing_report_DEMO
                     receive_present_state = ReportReceive_states.Req_AB;
                     break;
                 case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("State_A_to_B\n");
-
+                    if (scan_read)
+                    {
+                        send_Bluetooth("State_A_to_B\n");
+                    }
+                    else
+                    {
+                        send_Bluetooth("State_A_to_B_Single\n");
+                    }
                     read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-                    hook_Test_BC();
+                    if (scan_read)
+                    {
+                        hook_Test_BC();
+                    }
+
                     break;
             }
         }
@@ -1253,9 +1376,21 @@ namespace EV_Testing_report_DEMO
                     receive_present_state = ReportReceive_states.Req_BC;
                     break;
                 case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("State_B_to_C\n");
+                    if (scan_read)
+                    {
+                        send_Bluetooth("State_B_to_C\n");
+                    }
+                    else
+                    {
+                        send_Bluetooth("State_B_to_C_Single\n");
+                    }
+
                     read_result_B_to_C(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-                    hook_Test_BD();
+                    if (scan_read)
+                    {
+                        hook_Test_BD();
+                    }
+
                     break;
             }
 
@@ -1271,7 +1406,15 @@ namespace EV_Testing_report_DEMO
                     receive_present_state = ReportReceive_states.Req_CB;
                     break;
                 case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("State_C_to_B\n");
+                    if (scan_read)
+                    {
+                        send_Bluetooth("State_C_to_B\n");
+                    }
+                    else
+                    {
+                        send_Bluetooth("State_C_to_B_Single\n");
+                    }
+
                     read_result_C_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
 
                     Enable_All_Test_BTN(true);
@@ -1291,9 +1434,22 @@ namespace EV_Testing_report_DEMO
                     receive_present_state = ReportReceive_states.Req_BD;
                     break;
                 case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("State_B_to_D\n");
+                    if (scan_read)
+                    {
+                        send_Bluetooth("State_B_to_D\n");
+                    }
+                    else
+                    {
+                        send_Bluetooth("State_B_to_D_Single\n");
+                    }
+
                     read_result_B_to_D(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-                    hook_Test_CB();
+
+                    if (scan_read)
+                    {
+                        hook_Test_CB();
+                    }
+
                     break;
             }
 
@@ -1445,8 +1601,9 @@ namespace EV_Testing_report_DEMO
 
         private void Test_ALL_BTN_Click(object sender, EventArgs e)
         {
-            hook_Test_AB();
+
             scan_read = true;
+            hook_Test_AB();
             // Lock all Test button
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
@@ -2498,7 +2655,7 @@ Package_req = "State_B_to_C"
                         updateESP32_Connection_Status(true);
                         isESP_connected = true;
 
-
+                        TestingMode.Visible = true;
 
                     }
                     catch (Exception)
@@ -2509,6 +2666,8 @@ Package_req = "State_B_to_C"
                         isESP_connected = false;
                         COM_Input.Enabled = true;
                         Connect_ESP_BTN.Enabled = true;
+
+                        TestingMode.Visible = false;
 
                         commu_mode = EVSE_Tester_CommunicationMode.None;
                     }
@@ -2553,9 +2712,24 @@ Package_req = "State_B_to_C"
 
         private void send_Bluetooth(string str)
         {
-            byte[] msg = Encoding.ASCII.GetBytes(str);
-            bluetoothStream.Write(msg, 0, msg.Length);
-            bluetoothStream.Flush();
+            try
+            {
+                byte[] msg = Encoding.ASCII.GetBytes(str);
+                bluetoothStream.Write(msg, 0, msg.Length);
+                bluetoothStream.Flush();
+            }
+            catch (IOException ex)
+            {
+                Bluetooth_Connect.Text = "Connect";
+                Bluetooth_Devices_List.Enabled = true;
+                updateESP32_Connection_Status(false);
+                isESP_connected = false;
+                COM_Input.Enabled = true;
+                Connect_ESP_BTN.Enabled = true;
+
+                commu_mode = EVSE_Tester_CommunicationMode.None;
+            }
+
         }
         private string receive_Bluetooth()
         {
@@ -2606,6 +2780,7 @@ Package_req = "State_B_to_C"
             return indata;
         }
 
+
         private void INJ_readCP_Click(object sender, EventArgs e)
         {
             send_Bluetooth("read_CP\n");
@@ -2621,7 +2796,172 @@ Package_req = "State_B_to_C"
             send_Bluetooth("read_INS\n");
         }
 
-        
+        private void ManualTestBTN_Click(object sender, EventArgs e)
+        {
+            switch (manual_State)
+            {
+                case EVSE_Manual_State.EV_State_A:
+                    break;
+                case EVSE_Manual_State.EV_State_B:
+                    scan_read = false;
+                    hook_Test_AB();
+                    break;
+                case EVSE_Manual_State.EV_State_C:
+                    scan_read = false;
+                    hook_Test_BC();
+                    break;
+                case EVSE_Manual_State.EV_State_D:
+                    scan_read = false;
+                    hook_Test_BD();
+                    break;
+            }
+        }
+
+        void updateManualState()
+        {
+            switch (manual_State)
+            {
+                case EVSE_Manual_State.EV_State_A:
+                    selectState_A.Enabled = true;
+                    selectState_B.Enabled = true;
+                    selectState_C.Enabled = false;
+                    selectState_D.Enabled = false;
+                    break;
+                case EVSE_Manual_State.EV_State_B:
+                    selectState_A.Enabled = true;
+                    selectState_B.Enabled = true;
+                    selectState_C.Enabled = true;
+                    selectState_D.Enabled = true;
+                    break;
+                case EVSE_Manual_State.EV_State_C:
+                    selectState_A.Enabled = false;
+                    selectState_B.Enabled = true;
+                    selectState_C.Enabled = true;
+                    selectState_D.Enabled = false;
+                    break;
+                case EVSE_Manual_State.EV_State_D:
+                    selectState_A.Enabled = false;
+                    selectState_B.Enabled = true;
+                    selectState_C.Enabled = false;
+                    selectState_D.Enabled = true;
+                    break;
+            }
+        }
+
+        private void selectState_A_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void selectState_B_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void selectState_C_CheckedChanged(object sender, EventArgs e)
+        {
+
+
+        }
+
+        private void selectState_D_CheckedChanged(object sender, EventArgs e)
+        {
+
+
+        }
+
+        private void TestingMode_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TestingMode_TextUpdate(object sender, EventArgs e)
+        {
+
+        }
+
+        private void TestingMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (TestingMode.Text == "Manual")
+            {
+                //ManualTestBTN.Visible = true;
+                //selectState_A.Visible = true;
+                //selectState_B.Visible = true;
+                //selectState_C.Visible = true;
+                //selectState_D.Visible = true;
+
+                Test_ALL_BTN.Visible = false;
+                cancelBTN.Visible = false;
+
+                AutoTest_Group.Visible = false;
+                ManualTest_Group.Visible = true;
+                send_Bluetooth("gotoManual");
+                manual_State = EVSE_Manual_State.EV_State_A;
+                updateManualState();
+                selectState_A.Checked = true;
+            }
+            else if (TestingMode.Text == "Auto")
+            {
+                //ManualTestBTN.Visible = false;
+                //selectState_A.Visible = false;
+                //selectState_B.Visible = false;
+                //selectState_C.Visible = false;
+                //selectState_D.Visible = false;
+
+                Test_ALL_BTN.Visible = true;
+                cancelBTN.Visible = true;
+
+                AutoTest_Group.Visible = true;
+                ManualTest_Group.Visible = false;
+                send_Bluetooth("gotoAuto");
+            }
+        }
+
+        private void selectState_A_Click(object sender, EventArgs e)
+        {
+            manual_State = EVSE_Manual_State.EV_State_A;
+            updateManualState();
+            send_Bluetooth("Force_A");
+        }
+
+        private void selectState_B_Click(object sender, EventArgs e)
+        {
+            manual_State = EVSE_Manual_State.EV_State_B;
+            updateManualState();
+            send_Bluetooth("Force_B");
+        }
+
+        private void selectState_C_Click(object sender, EventArgs e)
+        {
+            manual_State = EVSE_Manual_State.EV_State_C;
+            updateManualState();
+            send_Bluetooth("Force_C");
+        }
+
+        private void selectState_D_Click(object sender, EventArgs e)
+        {
+            manual_State = EVSE_Manual_State.EV_State_D;
+            updateManualState();
+            send_Bluetooth("Force_D");
+        }
+
+        private void AutoScheme_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (AutoScheme.SelectedIndex)
+            {
+                case 0:
+                    picScheme.Image = Properties.Resources.TestingScheme1;
+                    break;
+                case 1:
+                    picScheme.Image = Properties.Resources.TestingSCheme2;
+                    break;
+            }
+        }
+
+        private void picScheme_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class Request_Testing_Result
@@ -2706,5 +3046,11 @@ Package_req = "State_B_to_C"
         TestDiode_Short,
         TestPE_Open,
         TestDiode_Open
+    }
+    enum EVSE_Manual_State { 
+        EV_State_A,
+        EV_State_B,
+        EV_State_C,
+        EV_State_D
     }
 }
