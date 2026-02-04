@@ -26,8 +26,8 @@
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             Connect_ESP_BTN = new Button();
             label1 = new Label();
@@ -112,7 +112,6 @@
             Diode_Short_check = new Label();
             PE_Open_check = new Label();
             DiodeOpen_check = new Label();
-            ExportPDF = new Button();
             Save_to = new FolderBrowserDialog();
             exp_dir = new Button();
             label39 = new Label();
@@ -228,6 +227,8 @@
             Test_InsulatNeut = new Button();
             tabControl3 = new TabControl();
             testingGraphic = new TabPage();
+            Test_CP_Sample = new Label();
+            SamplingCP = new Button();
             RCD_TestingInjectedCurrent = new Label();
             RCD_Accecptable_TripTime = new Label();
             RCD_TripTime_ms_sts = new Label();
@@ -310,6 +311,52 @@
             TestControlTab = new TabPage();
             label70 = new Label();
             DocumentTab = new TabPage();
+            tabPage5 = new TabPage();
+            tabControl4 = new TabControl();
+            tabPage6 = new TabPage();
+            AB_Freq = new RadioButton();
+            AB_Time = new RadioButton();
+            TmeDomain = new Button();
+            FFT_BTN = new Button();
+            groupBox1 = new GroupBox();
+            label74 = new Label();
+            label73 = new Label();
+            label72 = new Label();
+            Vmin_AB = new Label();
+            Vmax_AB = new Label();
+            Duty_AB = new Label();
+            Freq_AB = new Label();
+            label71 = new Label();
+            CP_B2_Pic = new PictureBox();
+            tabPage7 = new TabPage();
+            BC_Freq = new RadioButton();
+            BC_Time = new RadioButton();
+            groupBox2 = new GroupBox();
+            Vmin_BC = new Label();
+            Vmax_BC = new Label();
+            Duty_BC = new Label();
+            Freq_BC = new Label();
+            label75 = new Label();
+            label76 = new Label();
+            label77 = new Label();
+            label78 = new Label();
+            CP_C2_Pic = new PictureBox();
+            tabPage8 = new TabPage();
+            CD_Freq = new RadioButton();
+            CD_Time = new RadioButton();
+            groupBox3 = new GroupBox();
+            Vmin_CD = new Label();
+            Vmax_CD = new Label();
+            Duty_CD = new Label();
+            Freq_CD = new Label();
+            label79 = new Label();
+            label80 = new Label();
+            label81 = new Label();
+            label82 = new Label();
+            CP_D_Pic = new PictureBox();
+            Waveform_pic = new PictureBox();
+            LoopTimer = new System.Windows.Forms.Timer(components);
+            button1 = new Button();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -323,6 +370,18 @@
             ((System.ComponentModel.ISupportInitialize)picScheme).BeginInit();
             TestControlTab.SuspendLayout();
             DocumentTab.SuspendLayout();
+            tabPage5.SuspendLayout();
+            tabControl4.SuspendLayout();
+            tabPage6.SuspendLayout();
+            groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_B2_Pic).BeginInit();
+            tabPage7.SuspendLayout();
+            groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_C2_Pic).BeginInit();
+            tabPage8.SuspendLayout();
+            groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_D_Pic).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Waveform_pic).BeginInit();
             SuspendLayout();
             // 
             // Connect_ESP_BTN
@@ -1168,18 +1227,6 @@
             DiodeOpen_check.Size = new Size(20, 15);
             DiodeOpen_check.TabIndex = 85;
             DiodeOpen_check.Text = "(-)";
-            // 
-            // ExportPDF
-            // 
-            ExportPDF.Location = new Point(8, 352);
-            ExportPDF.Margin = new Padding(2);
-            ExportPDF.Name = "ExportPDF";
-            ExportPDF.Size = new Size(129, 29);
-            ExportPDF.TabIndex = 86;
-            ExportPDF.Text = "Export Report PDF";
-            ExportPDF.UseVisualStyleBackColor = true;
-            ExportPDF.Visible = false;
-            ExportPDF.Click += ExportPDF_Click;
             // 
             // Save_to
             // 
@@ -2226,7 +2273,7 @@
             // 
             // INJ_readCP
             // 
-            INJ_readCP.Location = new Point(496, 600);
+            INJ_readCP.Location = new Point(40, 344);
             INJ_readCP.Name = "INJ_readCP";
             INJ_readCP.Size = new Size(75, 23);
             INJ_readCP.TabIndex = 139;
@@ -2237,7 +2284,7 @@
             // 
             // INJ_readPP
             // 
-            INJ_readPP.Location = new Point(496, 624);
+            INJ_readPP.Location = new Point(40, 368);
             INJ_readPP.Name = "INJ_readPP";
             INJ_readPP.Size = new Size(75, 23);
             INJ_readPP.TabIndex = 140;
@@ -2248,7 +2295,7 @@
             // 
             // INJ_readINS
             // 
-            INJ_readINS.Location = new Point(496, 648);
+            INJ_readINS.Location = new Point(40, 392);
             INJ_readINS.Name = "INJ_readINS";
             INJ_readINS.Size = new Size(75, 23);
             INJ_readINS.TabIndex = 141;
@@ -2292,16 +2339,23 @@
             tabControl3.Controls.Add(testingGraphic);
             tabControl3.Controls.Add(TestControlTab);
             tabControl3.Controls.Add(DocumentTab);
+            tabControl3.Controls.Add(tabPage5);
             tabControl3.Location = new Point(8, 8);
             tabControl3.Name = "tabControl3";
             tabControl3.SelectedIndex = 0;
-            tabControl3.Size = new Size(1640, 664);
+            tabControl3.Size = new Size(1640, 672);
             tabControl3.TabIndex = 149;
             // 
             // testingGraphic
             // 
             testingGraphic.BackgroundImage = (Image)resources.GetObject("testingGraphic.BackgroundImage");
+            testingGraphic.Controls.Add(button1);
+            testingGraphic.Controls.Add(Test_CP_Sample);
+            testingGraphic.Controls.Add(INJ_readINS);
+            testingGraphic.Controls.Add(SamplingCP);
+            testingGraphic.Controls.Add(INJ_readPP);
             testingGraphic.Controls.Add(RCD_TestingInjectedCurrent);
+            testingGraphic.Controls.Add(INJ_readCP);
             testingGraphic.Controls.Add(RCD_Accecptable_TripTime);
             testingGraphic.Controls.Add(RCD_TripTime_ms_sts);
             testingGraphic.Controls.Add(RCD_TripTime_ms);
@@ -2364,10 +2418,31 @@
             testingGraphic.Controls.Add(Bluetooth_Devices_List);
             testingGraphic.Location = new Point(4, 24);
             testingGraphic.Name = "testingGraphic";
-            testingGraphic.Size = new Size(1632, 636);
+            testingGraphic.Size = new Size(1632, 644);
             testingGraphic.TabIndex = 2;
             testingGraphic.Text = "Testing Control";
             testingGraphic.UseVisualStyleBackColor = true;
+            testingGraphic.Click += testingGraphic_Click;
+            // 
+            // Test_CP_Sample
+            // 
+            Test_CP_Sample.AutoSize = true;
+            Test_CP_Sample.Location = new Point(816, 568);
+            Test_CP_Sample.Name = "Test_CP_Sample";
+            Test_CP_Sample.Size = new Size(44, 15);
+            Test_CP_Sample.TabIndex = 181;
+            Test_CP_Sample.Text = "label71";
+            Test_CP_Sample.Visible = false;
+            // 
+            // SamplingCP
+            // 
+            SamplingCP.Location = new Point(864, 544);
+            SamplingCP.Name = "SamplingCP";
+            SamplingCP.Size = new Size(75, 23);
+            SamplingCP.TabIndex = 180;
+            SamplingCP.Text = "button1";
+            SamplingCP.UseVisualStyleBackColor = true;
+            SamplingCP.Click += SamplingCP_Click;
             // 
             // RCD_TestingInjectedCurrent
             // 
@@ -3144,6 +3219,7 @@
             ClrResult.TabIndex = 120;
             ClrResult.Text = "Clear Testing Result";
             ClrResult.UseVisualStyleBackColor = true;
+            ClrResult.Click += ClrResult_Click;
             // 
             // Bluetooth_Connect
             // 
@@ -3337,7 +3413,7 @@
             TestControlTab.Location = new Point(4, 24);
             TestControlTab.Name = "TestControlTab";
             TestControlTab.Padding = new Padding(3);
-            TestControlTab.Size = new Size(1632, 636);
+            TestControlTab.Size = new Size(1632, 644);
             TestControlTab.TabIndex = 0;
             TestControlTab.Text = "Testing Result";
             TestControlTab.UseVisualStyleBackColor = true;
@@ -3362,14 +3438,510 @@
             DocumentTab.Controls.Add(label43);
             DocumentTab.Controls.Add(label45);
             DocumentTab.Controls.Add(Exp_to);
-            DocumentTab.Controls.Add(ExportPDF);
             DocumentTab.Location = new Point(4, 24);
             DocumentTab.Name = "DocumentTab";
             DocumentTab.Padding = new Padding(3);
-            DocumentTab.Size = new Size(1632, 636);
+            DocumentTab.Size = new Size(1632, 644);
             DocumentTab.TabIndex = 1;
             DocumentTab.Text = "Document";
             DocumentTab.UseVisualStyleBackColor = true;
+            // 
+            // tabPage5
+            // 
+            tabPage5.Controls.Add(tabControl4);
+            tabPage5.Controls.Add(Waveform_pic);
+            tabPage5.Location = new Point(4, 24);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Size = new Size(1632, 644);
+            tabPage5.TabIndex = 3;
+            tabPage5.Text = "CP_Sample";
+            tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // tabControl4
+            // 
+            tabControl4.Controls.Add(tabPage6);
+            tabControl4.Controls.Add(tabPage7);
+            tabControl4.Controls.Add(tabPage8);
+            tabControl4.Location = new Point(12, 12);
+            tabControl4.Name = "tabControl4";
+            tabControl4.SelectedIndex = 0;
+            tabControl4.Size = new Size(1004, 528);
+            tabControl4.TabIndex = 1;
+            // 
+            // tabPage6
+            // 
+            tabPage6.Controls.Add(AB_Freq);
+            tabPage6.Controls.Add(AB_Time);
+            tabPage6.Controls.Add(TmeDomain);
+            tabPage6.Controls.Add(FFT_BTN);
+            tabPage6.Controls.Add(groupBox1);
+            tabPage6.Controls.Add(CP_B2_Pic);
+            tabPage6.Location = new Point(4, 24);
+            tabPage6.Name = "tabPage6";
+            tabPage6.Padding = new Padding(3);
+            tabPage6.Size = new Size(996, 500);
+            tabPage6.TabIndex = 0;
+            tabPage6.Text = "State B2";
+            tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // AB_Freq
+            // 
+            AB_Freq.AutoSize = true;
+            AB_Freq.Location = new Point(736, 164);
+            AB_Freq.Name = "AB_Freq";
+            AB_Freq.Size = new Size(125, 19);
+            AB_Freq.TabIndex = 5;
+            AB_Freq.TabStop = true;
+            AB_Freq.Text = "Frequency Domain";
+            AB_Freq.UseVisualStyleBackColor = true;
+            AB_Freq.CheckedChanged += AB_Freq_CheckedChanged;
+            // 
+            // AB_Time
+            // 
+            AB_Time.AutoSize = true;
+            AB_Time.Location = new Point(736, 144);
+            AB_Time.Name = "AB_Time";
+            AB_Time.Size = new Size(97, 19);
+            AB_Time.TabIndex = 4;
+            AB_Time.TabStop = true;
+            AB_Time.Text = "Time Domain";
+            AB_Time.UseVisualStyleBackColor = true;
+            AB_Time.CheckedChanged += AB_Time_CheckedChanged;
+            // 
+            // TmeDomain
+            // 
+            TmeDomain.Location = new Point(736, 236);
+            TmeDomain.Name = "TmeDomain";
+            TmeDomain.Size = new Size(128, 23);
+            TmeDomain.TabIndex = 3;
+            TmeDomain.Text = "Time Domain";
+            TmeDomain.UseVisualStyleBackColor = true;
+            TmeDomain.Visible = false;
+            TmeDomain.Click += TmeDomain_Click;
+            // 
+            // FFT_BTN
+            // 
+            FFT_BTN.Location = new Point(736, 212);
+            FFT_BTN.Name = "FFT_BTN";
+            FFT_BTN.Size = new Size(128, 23);
+            FFT_BTN.TabIndex = 2;
+            FFT_BTN.Text = "Frequency Domain";
+            FFT_BTN.UseVisualStyleBackColor = true;
+            FFT_BTN.Visible = false;
+            FFT_BTN.Click += FFT_BTN_Click;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(label74);
+            groupBox1.Controls.Add(label73);
+            groupBox1.Controls.Add(label72);
+            groupBox1.Controls.Add(Vmin_AB);
+            groupBox1.Controls.Add(Vmax_AB);
+            groupBox1.Controls.Add(Duty_AB);
+            groupBox1.Controls.Add(Freq_AB);
+            groupBox1.Controls.Add(label71);
+            groupBox1.Location = new Point(732, 8);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(244, 132);
+            groupBox1.TabIndex = 1;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Waveform Parameters";
+            // 
+            // label74
+            // 
+            label74.AutoSize = true;
+            label74.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label74.Location = new Point(12, 92);
+            label74.Name = "label74";
+            label74.Size = new Size(100, 21);
+            label74.TabIndex = 2;
+            label74.Text = "Voltage Min :";
+            // 
+            // label73
+            // 
+            label73.AutoSize = true;
+            label73.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label73.Location = new Point(12, 68);
+            label73.Name = "label73";
+            label73.Size = new Size(102, 21);
+            label73.TabIndex = 2;
+            label73.Text = "Voltage Max :";
+            // 
+            // label72
+            // 
+            label72.AutoSize = true;
+            label72.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label72.Location = new Point(12, 44);
+            label72.Name = "label72";
+            label72.Size = new Size(90, 21);
+            label72.TabIndex = 1;
+            label72.Text = "Duty Ratio :";
+            // 
+            // Vmin_AB
+            // 
+            Vmin_AB.AutoSize = true;
+            Vmin_AB.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmin_AB.Location = new Point(120, 92);
+            Vmin_AB.Name = "Vmin_AB";
+            Vmin_AB.Size = new Size(16, 21);
+            Vmin_AB.TabIndex = 0;
+            Vmin_AB.Text = "-";
+            // 
+            // Vmax_AB
+            // 
+            Vmax_AB.AutoSize = true;
+            Vmax_AB.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmax_AB.Location = new Point(120, 68);
+            Vmax_AB.Name = "Vmax_AB";
+            Vmax_AB.Size = new Size(16, 21);
+            Vmax_AB.TabIndex = 0;
+            Vmax_AB.Text = "-";
+            // 
+            // Duty_AB
+            // 
+            Duty_AB.AutoSize = true;
+            Duty_AB.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Duty_AB.Location = new Point(120, 44);
+            Duty_AB.Name = "Duty_AB";
+            Duty_AB.Size = new Size(16, 21);
+            Duty_AB.TabIndex = 0;
+            Duty_AB.Text = "-";
+            // 
+            // Freq_AB
+            // 
+            Freq_AB.AutoSize = true;
+            Freq_AB.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Freq_AB.Location = new Point(120, 20);
+            Freq_AB.Name = "Freq_AB";
+            Freq_AB.Size = new Size(16, 21);
+            Freq_AB.TabIndex = 0;
+            Freq_AB.Text = "-";
+            // 
+            // label71
+            // 
+            label71.AutoSize = true;
+            label71.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label71.Location = new Point(12, 20);
+            label71.Name = "label71";
+            label71.Size = new Size(89, 21);
+            label71.TabIndex = 0;
+            label71.Text = "Frequency :";
+            // 
+            // CP_B2_Pic
+            // 
+            CP_B2_Pic.Location = new Point(8, 8);
+            CP_B2_Pic.Name = "CP_B2_Pic";
+            CP_B2_Pic.Size = new Size(720, 480);
+            CP_B2_Pic.TabIndex = 0;
+            CP_B2_Pic.TabStop = false;
+            // 
+            // tabPage7
+            // 
+            tabPage7.Controls.Add(BC_Freq);
+            tabPage7.Controls.Add(BC_Time);
+            tabPage7.Controls.Add(groupBox2);
+            tabPage7.Controls.Add(CP_C2_Pic);
+            tabPage7.Location = new Point(4, 24);
+            tabPage7.Name = "tabPage7";
+            tabPage7.Padding = new Padding(3);
+            tabPage7.Size = new Size(996, 500);
+            tabPage7.TabIndex = 1;
+            tabPage7.Text = "State C2";
+            tabPage7.UseVisualStyleBackColor = true;
+            // 
+            // BC_Freq
+            // 
+            BC_Freq.AutoSize = true;
+            BC_Freq.Location = new Point(736, 164);
+            BC_Freq.Name = "BC_Freq";
+            BC_Freq.Size = new Size(125, 19);
+            BC_Freq.TabIndex = 7;
+            BC_Freq.TabStop = true;
+            BC_Freq.Text = "Frequency Domain";
+            BC_Freq.UseVisualStyleBackColor = true;
+            BC_Freq.CheckedChanged += BC_Freq_CheckedChanged;
+            // 
+            // BC_Time
+            // 
+            BC_Time.AutoSize = true;
+            BC_Time.Location = new Point(736, 144);
+            BC_Time.Name = "BC_Time";
+            BC_Time.Size = new Size(97, 19);
+            BC_Time.TabIndex = 6;
+            BC_Time.TabStop = true;
+            BC_Time.Text = "Time Domain";
+            BC_Time.UseVisualStyleBackColor = true;
+            BC_Time.CheckedChanged += BC_Time_CheckedChanged;
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(Vmin_BC);
+            groupBox2.Controls.Add(Vmax_BC);
+            groupBox2.Controls.Add(Duty_BC);
+            groupBox2.Controls.Add(Freq_BC);
+            groupBox2.Controls.Add(label75);
+            groupBox2.Controls.Add(label76);
+            groupBox2.Controls.Add(label77);
+            groupBox2.Controls.Add(label78);
+            groupBox2.Location = new Point(732, 8);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(244, 132);
+            groupBox2.TabIndex = 3;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Waveform Parameters";
+            // 
+            // Vmin_BC
+            // 
+            Vmin_BC.AutoSize = true;
+            Vmin_BC.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmin_BC.Location = new Point(120, 92);
+            Vmin_BC.Name = "Vmin_BC";
+            Vmin_BC.Size = new Size(16, 21);
+            Vmin_BC.TabIndex = 3;
+            Vmin_BC.Text = "-";
+            // 
+            // Vmax_BC
+            // 
+            Vmax_BC.AutoSize = true;
+            Vmax_BC.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmax_BC.Location = new Point(120, 68);
+            Vmax_BC.Name = "Vmax_BC";
+            Vmax_BC.Size = new Size(16, 21);
+            Vmax_BC.TabIndex = 4;
+            Vmax_BC.Text = "-";
+            // 
+            // Duty_BC
+            // 
+            Duty_BC.AutoSize = true;
+            Duty_BC.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Duty_BC.Location = new Point(120, 44);
+            Duty_BC.Name = "Duty_BC";
+            Duty_BC.Size = new Size(16, 21);
+            Duty_BC.TabIndex = 5;
+            Duty_BC.Text = "-";
+            // 
+            // Freq_BC
+            // 
+            Freq_BC.AutoSize = true;
+            Freq_BC.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Freq_BC.Location = new Point(120, 20);
+            Freq_BC.Name = "Freq_BC";
+            Freq_BC.Size = new Size(16, 21);
+            Freq_BC.TabIndex = 6;
+            Freq_BC.Text = "-";
+            // 
+            // label75
+            // 
+            label75.AutoSize = true;
+            label75.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label75.Location = new Point(12, 92);
+            label75.Name = "label75";
+            label75.Size = new Size(100, 21);
+            label75.TabIndex = 2;
+            label75.Text = "Voltage Min :";
+            // 
+            // label76
+            // 
+            label76.AutoSize = true;
+            label76.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label76.Location = new Point(12, 68);
+            label76.Name = "label76";
+            label76.Size = new Size(102, 21);
+            label76.TabIndex = 2;
+            label76.Text = "Voltage Max :";
+            // 
+            // label77
+            // 
+            label77.AutoSize = true;
+            label77.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label77.Location = new Point(12, 44);
+            label77.Name = "label77";
+            label77.Size = new Size(90, 21);
+            label77.TabIndex = 1;
+            label77.Text = "Duty Ratio :";
+            // 
+            // label78
+            // 
+            label78.AutoSize = true;
+            label78.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label78.Location = new Point(12, 20);
+            label78.Name = "label78";
+            label78.Size = new Size(89, 21);
+            label78.TabIndex = 0;
+            label78.Text = "Frequency :";
+            // 
+            // CP_C2_Pic
+            // 
+            CP_C2_Pic.Location = new Point(8, 8);
+            CP_C2_Pic.Name = "CP_C2_Pic";
+            CP_C2_Pic.Size = new Size(720, 480);
+            CP_C2_Pic.TabIndex = 2;
+            CP_C2_Pic.TabStop = false;
+            // 
+            // tabPage8
+            // 
+            tabPage8.Controls.Add(CD_Freq);
+            tabPage8.Controls.Add(CD_Time);
+            tabPage8.Controls.Add(groupBox3);
+            tabPage8.Controls.Add(CP_D_Pic);
+            tabPage8.Location = new Point(4, 24);
+            tabPage8.Name = "tabPage8";
+            tabPage8.Size = new Size(996, 500);
+            tabPage8.TabIndex = 2;
+            tabPage8.Text = "State D";
+            tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // CD_Freq
+            // 
+            CD_Freq.AutoSize = true;
+            CD_Freq.Location = new Point(736, 164);
+            CD_Freq.Name = "CD_Freq";
+            CD_Freq.Size = new Size(125, 19);
+            CD_Freq.TabIndex = 7;
+            CD_Freq.Text = "Frequency Domain";
+            CD_Freq.UseVisualStyleBackColor = true;
+            CD_Freq.CheckedChanged += CD_Freq_CheckedChanged;
+            // 
+            // CD_Time
+            // 
+            CD_Time.AutoSize = true;
+            CD_Time.Location = new Point(736, 144);
+            CD_Time.Name = "CD_Time";
+            CD_Time.Size = new Size(97, 19);
+            CD_Time.TabIndex = 6;
+            CD_Time.Text = "Time Domain";
+            CD_Time.UseVisualStyleBackColor = true;
+            CD_Time.CheckedChanged += CD_Time_CheckedChanged;
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(Vmin_CD);
+            groupBox3.Controls.Add(Vmax_CD);
+            groupBox3.Controls.Add(Duty_CD);
+            groupBox3.Controls.Add(Freq_CD);
+            groupBox3.Controls.Add(label79);
+            groupBox3.Controls.Add(label80);
+            groupBox3.Controls.Add(label81);
+            groupBox3.Controls.Add(label82);
+            groupBox3.Location = new Point(732, 8);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(244, 132);
+            groupBox3.TabIndex = 3;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Waveform Parameters";
+            // 
+            // Vmin_CD
+            // 
+            Vmin_CD.AutoSize = true;
+            Vmin_CD.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmin_CD.Location = new Point(120, 92);
+            Vmin_CD.Name = "Vmin_CD";
+            Vmin_CD.Size = new Size(16, 21);
+            Vmin_CD.TabIndex = 3;
+            Vmin_CD.Text = "-";
+            // 
+            // Vmax_CD
+            // 
+            Vmax_CD.AutoSize = true;
+            Vmax_CD.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Vmax_CD.Location = new Point(120, 68);
+            Vmax_CD.Name = "Vmax_CD";
+            Vmax_CD.Size = new Size(16, 21);
+            Vmax_CD.TabIndex = 4;
+            Vmax_CD.Text = "-";
+            // 
+            // Duty_CD
+            // 
+            Duty_CD.AutoSize = true;
+            Duty_CD.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Duty_CD.Location = new Point(120, 44);
+            Duty_CD.Name = "Duty_CD";
+            Duty_CD.Size = new Size(16, 21);
+            Duty_CD.TabIndex = 5;
+            Duty_CD.Text = "-";
+            // 
+            // Freq_CD
+            // 
+            Freq_CD.AutoSize = true;
+            Freq_CD.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            Freq_CD.Location = new Point(120, 20);
+            Freq_CD.Name = "Freq_CD";
+            Freq_CD.Size = new Size(16, 21);
+            Freq_CD.TabIndex = 6;
+            Freq_CD.Text = "-";
+            // 
+            // label79
+            // 
+            label79.AutoSize = true;
+            label79.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label79.Location = new Point(12, 92);
+            label79.Name = "label79";
+            label79.Size = new Size(100, 21);
+            label79.TabIndex = 2;
+            label79.Text = "Voltage Min :";
+            // 
+            // label80
+            // 
+            label80.AutoSize = true;
+            label80.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label80.Location = new Point(12, 68);
+            label80.Name = "label80";
+            label80.Size = new Size(102, 21);
+            label80.TabIndex = 2;
+            label80.Text = "Voltage Max :";
+            // 
+            // label81
+            // 
+            label81.AutoSize = true;
+            label81.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label81.Location = new Point(12, 44);
+            label81.Name = "label81";
+            label81.Size = new Size(90, 21);
+            label81.TabIndex = 1;
+            label81.Text = "Duty Ratio :";
+            // 
+            // label82
+            // 
+            label82.AutoSize = true;
+            label82.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            label82.Location = new Point(12, 20);
+            label82.Name = "label82";
+            label82.Size = new Size(89, 21);
+            label82.TabIndex = 0;
+            label82.Text = "Frequency :";
+            // 
+            // CP_D_Pic
+            // 
+            CP_D_Pic.Location = new Point(8, 8);
+            CP_D_Pic.Name = "CP_D_Pic";
+            CP_D_Pic.Size = new Size(720, 480);
+            CP_D_Pic.TabIndex = 2;
+            CP_D_Pic.TabStop = false;
+            // 
+            // Waveform_pic
+            // 
+            Waveform_pic.Location = new Point(904, 8);
+            Waveform_pic.Name = "Waveform_pic";
+            Waveform_pic.Size = new Size(720, 480);
+            Waveform_pic.TabIndex = 0;
+            Waveform_pic.TabStop = false;
+            Waveform_pic.Visible = false;
+            // 
+            // LoopTimer
+            // 
+            LoopTimer.Enabled = true;
+            LoopTimer.Interval = 20;
+            LoopTimer.Tick += LoopTimer_Tick;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(920, 588);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 182;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
             // 
             // Form1
             // 
@@ -3378,9 +3950,6 @@
             BackColor = Color.White;
             ClientSize = new Size(1664, 681);
             Controls.Add(tabControl3);
-            Controls.Add(INJ_readINS);
-            Controls.Add(INJ_readPP);
-            Controls.Add(INJ_readCP);
             Controls.Add(TestBluetoothTxt);
             Controls.Add(TestBluetooth);
             Controls.Add(SerialMoni);
@@ -3409,6 +3978,24 @@
             TestControlTab.PerformLayout();
             DocumentTab.ResumeLayout(false);
             DocumentTab.PerformLayout();
+            tabPage5.ResumeLayout(false);
+            tabControl4.ResumeLayout(false);
+            tabPage6.ResumeLayout(false);
+            tabPage6.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_B2_Pic).EndInit();
+            tabPage7.ResumeLayout(false);
+            tabPage7.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_C2_Pic).EndInit();
+            tabPage8.ResumeLayout(false);
+            tabPage8.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)CP_D_Pic).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Waveform_pic).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -3497,7 +4084,6 @@
         private Label Diode_Short_check;
         private Label PE_Open_check;
         private Label DiodeOpen_check;
-        private Button ExportPDF;
         private FolderBrowserDialog Save_to;
         private Button exp_dir;
         private Label label39;
@@ -3695,5 +4281,53 @@
         private Label RCD_TripTime_ms_sts;
         private Label RCD_TripTime_ms;
         private Button RCD_TestBTN;
+        private System.Windows.Forms.Timer LoopTimer;
+        private Button SamplingCP;
+        private Label Test_CP_Sample;
+        private TabPage tabPage5;
+        private PictureBox Waveform_pic;
+        private TabControl tabControl4;
+        private TabPage tabPage6;
+        private GroupBox groupBox1;
+        private Label label71;
+        private PictureBox CP_B2_Pic;
+        private TabPage tabPage7;
+        private TabPage tabPage8;
+        private Label label72;
+        private Label label74;
+        private Label label73;
+        private GroupBox groupBox2;
+        private Label label75;
+        private Label label76;
+        private Label label77;
+        private Label label78;
+        private PictureBox CP_C2_Pic;
+        private GroupBox groupBox3;
+        private Label label79;
+        private Label label80;
+        private Label label81;
+        private Label label82;
+        private PictureBox CP_D_Pic;
+        private Button FFT_BTN;
+        private Button TmeDomain;
+        private RadioButton AB_Freq;
+        private RadioButton AB_Time;
+        private RadioButton BC_Freq;
+        private RadioButton BC_Time;
+        private RadioButton CD_Freq;
+        private RadioButton CD_Time;
+        private Label Vmin_AB;
+        private Label Vmax_AB;
+        private Label Duty_AB;
+        private Label Freq_AB;
+        private Label Vmin_BC;
+        private Label Vmax_BC;
+        private Label Duty_BC;
+        private Label Freq_BC;
+        private Label Vmin_CD;
+        private Label Vmax_CD;
+        private Label Duty_CD;
+        private Label Freq_CD;
+        private Button button1;
     }
 }

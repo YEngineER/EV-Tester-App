@@ -17,11 +17,14 @@ using InTheHand.Net.Bluetooth;
 using InTheHand.Net;
 using System.Text;
 
+using System.Numerics;
+using System.Linq;
+using DocumentFormat.OpenXml.Drawing.Charts;
+
 namespace EV_Testing_report_DEMO
 {
 
-    public partial class Form1 : Form
-    {
+    public partial class Form1 : Form {
         SerialPort esp32_module;
         ReportReceive_states receive_present_state;
 
@@ -33,6 +36,8 @@ namespace EV_Testing_report_DEMO
         Diode_Test? result_diode_test = new Diode_Test { };
         RCD0? result_rcd_test = new RCD0 { };
         Insulation_Test? Insulation_Test = new Insulation_Test { };
+
+        int num = 0;
 
         bool[] testing_Check = { false, false, false, false, false, false, false };
         bool scan_read = false;
@@ -52,10 +57,11 @@ namespace EV_Testing_report_DEMO
 
         Stream bluetoothStream;
         byte[] receiveBuffer = new byte[512];
+        float[] cp_sample_AB;
+        float[] cp_sample_BC;
+        float[] cp_sample_CD;
 
-
-        public Form1()
-        {
+        public Form1() {
             InitializeComponent();
 
             esp32_module = new SerialPort();
@@ -83,35 +89,24 @@ namespace EV_Testing_report_DEMO
 
             //Req_report.Enabled = esp32_module.IsOpen;
         }
-        private void hook_Connect_ESP()
-        {
-            if (esp32_module.IsOpen == false)
-            {
+        private void hook_Connect_ESP() {
+            if (esp32_module.IsOpen == false) {
                 esp32_module.BaudRate = 115200;
-                try
-                {
+                try {
                     esp32_module.PortName = COM_Input.Text;
-                }
-                catch (ArgumentException ex)
-                {
+                } catch (ArgumentException ex) {
                     ESP_Status.Text = ex.Message;
                 }
 
 
-                try
-                {
+                try {
                     esp32_module.Open();
                     updateESP32_Connection_Status(esp32_module.IsOpen);
-                }
-                catch (FileNotFoundException fe)
-                {
-                    if (ESP_Status.InvokeRequired)
-                    {
+                } catch (FileNotFoundException fe) {
+                    if (ESP_Status.InvokeRequired) {
                         Action update_connect_status = delegate { updateESP32_Connection_Status(false); };
                         ESP_Status.Invoke(update_connect_status);
-                    }
-                    else
-                    {
+                    } else {
                         ESP_Status.Text = fe.Message;
 
                     }
@@ -119,37 +114,27 @@ namespace EV_Testing_report_DEMO
 
                 commu_mode = EVSE_Tester_CommunicationMode.SerialPort;
 
-            }
-            else
-            {
+            } else {
                 esp32_module.Close();
                 updateESP32_Connection_Status(esp32_module.IsOpen);
                 commu_mode = EVSE_Tester_CommunicationMode.None;
             }
         }
-        private void Connect_ESP_BTN_Click(object sender, EventArgs e)
-        {
+        private void Connect_ESP_BTN_Click(object sender, EventArgs e) {
             hook_Connect_ESP();
         }
 
-        private void updateESP32_Connection_Status(bool sts)
-        {
+        private void updateESP32_Connection_Status(bool sts) {
 
-            if (ESP_Status.InvokeRequired)
-            {
+            if (ESP_Status.InvokeRequired) {
                 Action update_connect_status = delegate { updateESP32_Connection_Status(sts); };
                 ESP_Status.Invoke(update_connect_status);
-            }
-            else
-            {
-                if (sts)
-                {
+            } else {
+                if (sts) {
                     ESP_Status.Text = "Connected";
                     Connect_ESP_BTN.Text = "Disconnect to ESP32";
                     isESP_connected = true;
-                }
-                else
-                {
+                } else {
                     ESP_Status.Text = "Not Connected";
                     Connect_ESP_BTN.Text = "Connect to ESP32";
                     isESP_connected = false;
@@ -161,15 +146,11 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        private void Enable_All_Test_BTN(bool sts)
-        {
-            if (Test_AB.InvokeRequired)
-            {
+        private void Enable_All_Test_BTN(bool sts) {
+            if (Test_AB.InvokeRequired) {
                 Action test_sts_req = delegate { Enable_All_Test_BTN(sts); };
                 Test_AB.Invoke(test_sts_req);
-            }
-            else
-            {
+            } else {
                 Test_AB.Enabled = sts;
                 Test_BC.Enabled = sts;
                 Test_CB.Enabled = sts;
@@ -186,17 +167,12 @@ namespace EV_Testing_report_DEMO
             }
         }
 
-        void update_btn_Text()
-        {
-            if (Test_AB.InvokeRequired)
-            {
+        void update_btn_Text() {
+            if (Test_AB.InvokeRequired) {
                 Action test_sts_req = delegate { update_btn_Text(); };
                 Test_AB.Invoke(test_sts_req);
-            }
-            else
-            {
-                switch (receive_present_state)
-                {
+            } else {
+                switch (receive_present_state) {
                     case ReportReceive_states.Standby:
                         Test_AB.Text = "Test";
                         Test_BC.Text = "Test";
@@ -274,23 +250,18 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        private void addTextToSerialMon(String str)
-        {
-            if (SerialMoni.InvokeRequired)
-            {
+        private void addTextToSerialMon(String str) {
+            if (SerialMoni.InvokeRequired) {
                 Action seri = delegate { addTextToSerialMon(str); };
                 SerialMoni.Invoke(seri);
-            }
-            else
-            {
+            } else {
                 SerialMoni.AppendText(str);
             }
 
         }
 
 
-        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
-        {
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e) {
             SerialPort sp = (SerialPort)sender;
             //string indata = sp.ReadExisting();
             string indata = "";
@@ -298,53 +269,43 @@ namespace EV_Testing_report_DEMO
 
             addTextToSerialMon(indata);
 
-            switch (receive_present_state)
-            {
+            switch (receive_present_state) {
                 case ReportReceive_states.Standby:
                     break;
                 case ReportReceive_states.Req_AB:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
                     read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(indata));
                     testing_Check[0] = true;
 
-                    if (scan_read)
-                    {
+                    if (scan_read) {
                         hook_Test_BC();
                         update_btn_Text();
-                    }
-                    else
-                    {
+                    } else {
                         receive_present_state = ReportReceive_states.Standby;
                         Enable_All_Test_BTN(true);
                     }
 
                     break;
                 case ReportReceive_states.Req_BC:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
                     read_result_B_to_C(JsonSerializer.Deserialize<State_Transition_Test>(indata));
                     testing_Check[1] = true;
-                    if (scan_read)
-                    {
+                    if (scan_read) {
                         hook_Test_BD();
                         update_btn_Text();
-                    }
-                    else
-                    {
+                    } else {
                         receive_present_state = ReportReceive_states.Standby;
                         Enable_All_Test_BTN(true);
                     }
 
                     break;
                 case ReportReceive_states.Req_CB:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
@@ -357,8 +318,7 @@ namespace EV_Testing_report_DEMO
 
                     break;
                 case ReportReceive_states.Req_BD://                                                       
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
@@ -366,21 +326,17 @@ namespace EV_Testing_report_DEMO
                     testing_Check[3] = true;
 
 
-                    if (scan_read)
-                    {
+                    if (scan_read) {
                         hook_Test_CB();
                         update_btn_Text();
-                    }
-                    else
-                    {
+                    } else {
                         receive_present_state = ReportReceive_states.Standby;
                         Enable_All_Test_BTN(true);
                     }
 
                     break;
                 case ReportReceive_states.Req_Diode:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
@@ -392,8 +348,7 @@ namespace EV_Testing_report_DEMO
 
                     break;
                 case ReportReceive_states.Req_RCD:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
@@ -403,8 +358,7 @@ namespace EV_Testing_report_DEMO
                     Enable_All_Test_BTN(true);
                     break;
                 case ReportReceive_states.Req_Insul:
-                    while (indata.ToCharArray()[0] != '{')
-                    {
+                    while (indata.ToCharArray()[0] != '{') {
                         indata = sp.ReadLine();
                     }
 
@@ -418,19 +372,14 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        void read_result_A_to_B(State_Transition_Test s_A_B)
-        {
+        void read_result_A_to_B(State_Transition_Test s_A_B) {
             result_State_A_to_B = s_A_B;
-            if (AB_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (AB_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_A_to_B(s_A_B);
                 };
                 AB_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 AB_PWM_Startup.Text = result_State_A_to_B.PWM_StartupDelay + " ms";
             }
 
@@ -440,88 +389,74 @@ namespace EV_Testing_report_DEMO
             AB_PWM_Duty.Text = result_State_A_to_B.PWM_DutyCycle + " %";
             AB_PWM_Imax.Text = result_State_A_to_B.PWM_Imax + " A";
 
-            
 
-            if (result_State_A_to_B.PWM_StartupDelay_Result)
-            {
+
+            if (result_State_A_to_B.PWM_StartupDelay_Result) {
                 AB_PWM_Startup_Result.Text = "Pass";
                 AB_PWM_Startup_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_Startup_Result.Text = "Fail";
                 AB_PWM_Startup_Result.ForeColor = Color.Red;
             }
-            if (result_State_A_to_B.PWM_Amplitude_Result)
-            {
+            if (result_State_A_to_B.PWM_Amplitude_Result) {
                 AB_PWM_Amp_Result.Text = "Pass";
                 AB_PWM_Amp_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_Amp_Result.Text = "Fail";
                 AB_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_A_to_B.PWM_NveAmplitude_Result)
-            {
+            if (result_State_A_to_B.PWM_NveAmplitude_Result) {
                 AB_PWM_NVE_Result.Text = "Pass";
                 AB_PWM_NVE_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_NVE_Result.Text = "Fail";
                 AB_PWM_NVE_Result.ForeColor = Color.Red;
             }
-            if (result_State_A_to_B.PWM_Freq_Result)
-            {
+            if (result_State_A_to_B.PWM_Freq_Result) {
                 AB_PWM_Freq_Result.Text = "Pass";
                 AB_PWM_Freq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_Freq_Result.Text = "Fail";
                 AB_PWM_Freq_Result.ForeColor = Color.Red;
             }
-            if (result_State_A_to_B.PWM_DutyCycle_Result)
-            {
+            if (result_State_A_to_B.PWM_DutyCycle_Result) {
                 AB_PWM_Duty_Result.Text = "Pass";
                 AB_PWM_Duty_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_Duty_Result.Text = "Fail";
                 AB_PWM_Duty_Result.ForeColor = Color.Red;
             }
-            if (result_State_A_to_B.PWM_Imax_Result)
-            {
+            if (result_State_A_to_B.PWM_Imax_Result) {
                 AB_PWM_Imax_Result.Text = "Pass";
                 AB_PWM_Imax_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 AB_PWM_Imax_Result.Text = "Fail";
                 AB_PWM_Imax_Result.ForeColor = Color.Red;
             }
 
             // front page
-            B_PWM_Pk.Text       = AB_PWM_Amp.Text;
-            B_PWM_nPk.Text      = AB_PWM_NVE.Text;
-            B_PWM_Freq.Text     = AB_PWM_Freq.Text;
-            B_PWM_Duty.Text     = AB_PWM_Duty.Text;
-            B_PWM_Imax.Text     = AB_PWM_Imax.Text;
+            B_PWM_Pk.Text = AB_PWM_Amp.Text;
+            B_PWM_nPk.Text = AB_PWM_NVE.Text;
+            B_PWM_Freq.Text = AB_PWM_Freq.Text;
+            B_PWM_Duty.Text = AB_PWM_Duty.Text;
+            B_PWM_Imax.Text = AB_PWM_Imax.Text;
 
             B_PWM_Imax_sts.Text = AB_PWM_Imax_Result.Text;
-            B_PWM_Pk_sts.Text   = AB_PWM_Amp_Result.Text;
-            B_PWM_nPk_sts.Text  = AB_PWM_NVE_Result.Text;
+            B_PWM_Pk_sts.Text = AB_PWM_Amp_Result.Text;
+            B_PWM_nPk_sts.Text = AB_PWM_NVE_Result.Text;
             B_PWM_Freq_sts.Text = AB_PWM_Freq_Result.Text;
             B_PWM_Duty_sts.Text = AB_PWM_Duty_Result.Text;
 
-            B_PWM_Imax_sts.ForeColor    = AB_PWM_Imax_Result.ForeColor;
-            B_PWM_Pk_sts.ForeColor      = AB_PWM_Amp_Result.ForeColor;
-            B_PWM_nPk_sts.ForeColor     = AB_PWM_NVE_Result.ForeColor;
-            B_PWM_Freq_sts.ForeColor    = AB_PWM_Freq_Result.ForeColor;
-            B_PWM_Duty_sts.ForeColor    = AB_PWM_Duty_Result.ForeColor;
+            B_PWM_Imax_sts.ForeColor = AB_PWM_Imax_Result.ForeColor;
+            B_PWM_Pk_sts.ForeColor = AB_PWM_Amp_Result.ForeColor;
+            B_PWM_nPk_sts.ForeColor = AB_PWM_NVE_Result.ForeColor;
+            B_PWM_Freq_sts.ForeColor = AB_PWM_Freq_Result.ForeColor;
+            B_PWM_Duty_sts.ForeColor = AB_PWM_Duty_Result.ForeColor;
 
+            update_Freq_AB(result_State_A_to_B.PWM_Freq + " Hz");
+            update_Duty_AB(result_State_A_to_B.PWM_DutyCycle + " %");
+            update_Vmax_AB(result_State_A_to_B.PWM_Amplitude + " V");
+            update_Vmin_AB(result_State_A_to_B.PWM_NveAmplitude + " V");
 
             /*
             if (result_State_A_to_B.Testing_Result)
@@ -536,19 +471,14 @@ namespace EV_Testing_report_DEMO
             }
             */
         }
-        void read_result_B_to_C(State_Transition_Test s_B_C)
-        {
+        void read_result_B_to_C(State_Transition_Test s_B_C) {
             result_State_B_to_C = s_B_C;
-            if (BC_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (BC_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_B_to_C(s_B_C);
                 };
                 BC_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 BC_PWM_Startup.Text = result_State_B_to_C.PWM_StartupDelay + " ms";
             }
 
@@ -574,103 +504,73 @@ namespace EV_Testing_report_DEMO
             BC_PWM_MainFreq.Text = result_State_B_to_C.MainsFreq + " Hz";
             BC_PP.Text = result_State_B_to_C.PP + " A";
 
-            if (result_State_B_to_C.PWM_StartupDelay_Result)
-            {
+            if (result_State_B_to_C.PWM_StartupDelay_Result) {
                 BC_PWM_Startup_Result.Text = "Pass";
                 BC_PWM_Startup_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_Startup_Result.Text = "Fail";
                 BC_PWM_Startup_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PWM_Amplitude_Result)
-            {
+            if (result_State_B_to_C.PWM_Amplitude_Result) {
                 BC_PWM_Amp_Result.Text = "Pass";
                 BC_PWM_Amp_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_Amp_Result.Text = "Fail";
                 BC_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PWM_NveAmplitude_Result)
-            {
+            if (result_State_B_to_C.PWM_NveAmplitude_Result) {
                 BC_PWM_NVE_Result.Text = "Pass";
                 BC_PWM_NVE_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_NVE_Result.Text = "Fail";
                 BC_PWM_NVE_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PWM_Freq_Result)
-            {
+            if (result_State_B_to_C.PWM_Freq_Result) {
                 BC_PWM_Freq_Result.Text = "Pass";
                 BC_PWM_Freq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_Freq_Result.Text = "Fail";
                 BC_PWM_Freq_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PWM_DutyCycle_Result)
-            {
+            if (result_State_B_to_C.PWM_DutyCycle_Result) {
                 BC_PWM_Duty_Result.Text = "Pass";
                 BC_PWM_Duty_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_Duty_Result.Text = "Fail";
                 BC_PWM_Duty_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PWM_Imax_Result)
-            {
+            if (result_State_B_to_C.PWM_Imax_Result) {
                 BC_PWM_Imax_Result.Text = "Pass";
                 BC_PWM_Imax_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_Imax_Result.Text = "Fail";
                 BC_PWM_Imax_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.Voltage_Result)
-            {
+            if (result_State_B_to_C.Voltage_Result) {
                 BC_Voltage_Result.Text = "Pass";
                 BC_Voltage_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_Voltage_Result.Text = "Fail";
                 BC_Voltage_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.MainsOnDelay_Result)
-            {
+            if (result_State_B_to_C.MainsOnDelay_Result) {
                 BC_PWM_OnDel_Result.Text = "Pass";
                 BC_PWM_OnDel_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_OnDel_Result.Text = "Fail";
                 BC_PWM_OnDel_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.MainsFreq_Result)
-            {
+            if (result_State_B_to_C.MainsFreq_Result) {
                 BC_PWM_MainFreq_Result.Text = "Pass";
                 BC_PWM_MainFreq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PWM_MainFreq_Result.Text = "Fail";
                 BC_PWM_MainFreq_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_C.PP_Result)
-            {
+            if (result_State_B_to_C.PP_Result) {
                 BC_PP_Result.Text = "Pass";
                 BC_PP_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BC_PP_Result.Text = "Fail";
                 BC_PP_Result.ForeColor = Color.Red;
             }
@@ -706,20 +606,20 @@ namespace EV_Testing_report_DEMO
             C_PWM_MainVolt_sts.ForeColor = BC_Voltage_Result.ForeColor;
             C_PWM_MainFreq_sts.ForeColor = BC_PWM_MainFreq_Result.ForeColor;
             C_PWM_PP_sts.ForeColor = BC_PP_Result.ForeColor;
+
+            update_Freq_BC(result_State_B_to_C.PWM_Freq + " Hz");
+            update_Duty_BC(result_State_B_to_C.PWM_DutyCycle + " %");
+            update_Vmax_BC(result_State_B_to_C.PWM_Amplitude + " V");
+            update_Vmin_BC(result_State_B_to_C.PWM_NveAmplitude + " V");
         }
-        void read_result_C_to_B(State_Transition_Test s_C_B)
-        {
+        void read_result_C_to_B(State_Transition_Test s_C_B) {
             result_State_C_to_B = s_C_B;
-            if (CB_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (CB_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_C_to_B(s_C_B);
                 };
                 CB_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 CB_PWM_Startup.Text = result_State_C_to_B.PWM_StartupDelay + " ms";
             }
 
@@ -730,73 +630,52 @@ namespace EV_Testing_report_DEMO
             CB_PWM_Imax.Text = result_State_C_to_B.PWM_Imax + " A";
             CB_PWM_OffDel.Text = result_State_C_to_B.MainsOffDelay + " ms";
 
-            if (result_State_C_to_B.PWM_StartupDelay_Result)
-            {
+            if (result_State_C_to_B.PWM_StartupDelay_Result) {
                 CB_PWM_Startup_Result.Text = "Pass";
                 CB_PWM_Startup_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_Startup_Result.Text = "Fail";
                 CB_PWM_Startup_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_Amplitude_Result)
-            {
+            if (result_State_C_to_B.PWM_Amplitude_Result) {
                 CB_PWM_Amp_Result.Text = "Pass";
                 CB_PWM_Amp_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_Amp_Result.Text = "Fail";
                 CB_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_NveAmplitude_Result)
-            {
+            if (result_State_C_to_B.PWM_NveAmplitude_Result) {
                 CB_PWM_NVE_Result.Text = "Pass";
                 CB_PWM_NVE_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_NVE_Result.Text = "Fail";
                 CB_PWM_NVE_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_Freq_Result)
-            {
+            if (result_State_C_to_B.PWM_Freq_Result) {
                 CB_PWM_Freq_Result.Text = "Pass";
                 CB_PWM_Freq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_Freq_Result.Text = "Fail";
                 CB_PWM_Freq_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_DutyCycle_Result)
-            {
+            if (result_State_C_to_B.PWM_DutyCycle_Result) {
                 CB_PWM_Duty_Result.Text = "Pass";
                 CB_PWM_Duty_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_Duty_Result.Text = "Fail";
                 CB_PWM_Duty_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_Imax_Result)
-            {
+            if (result_State_C_to_B.PWM_Imax_Result) {
                 CB_PWM_Imax_Result.Text = "Pass";
                 CB_PWM_Imax_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_Imax_Result.Text = "Fail";
                 CB_PWM_Imax_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.MainsOffDelay_Result)
-            {
+            if (result_State_C_to_B.MainsOffDelay_Result) {
                 CB_PWM_OffDel_Result.Text = "Pass";
                 CB_PWM_OffDel_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 CB_PWM_OffDel_Result.Text = "Fail";
                 CB_PWM_OffDel_Result.ForeColor = Color.Red;
             }
@@ -826,19 +705,14 @@ namespace EV_Testing_report_DEMO
                 CB_check.ForeColor = Color.Red;
             }*/
         }
-        void read_result_B_to_D(State_Transition_Test s_B_D)
-        {
+        void read_result_B_to_D(State_Transition_Test s_B_D) {
             result_State_B_to_D = s_B_D;
-            if (BD_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (BD_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_B_to_D(s_B_D);
                 };
                 BD_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 BD_PWM_Startup.Text = result_State_B_to_D.PWM_StartupDelay + " ms";
             }
 
@@ -862,109 +736,79 @@ namespace EV_Testing_report_DEMO
             BD_PWM_MainFreq.Text = result_State_B_to_D.MainsFreq + " Hz";
             BD_PP.Text = result_State_B_to_D.PP + " A";
 
-            if (result_State_B_to_D.PWM_StartupDelay_Result)
-            {
+            if (result_State_B_to_D.PWM_StartupDelay_Result) {
                 BD_PWM_Startup_Result.Text = "Pass";
                 BD_PWM_Startup_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_Startup_Result.Text = "Fail";
                 BD_PWM_Startup_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_Amplitude_Result)
-            {
+            if (result_State_B_to_D.PWM_Amplitude_Result) {
                 BD_PWM_Amp_Result.Text = "Pass";
                 BD_PWM_Amp_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_Amp_Result.Text = "Fail";
                 BD_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_NveAmplitude_Result)
-            {
+            if (result_State_B_to_D.PWM_NveAmplitude_Result) {
                 BD_PWM_NVE_Result.Text = "Pass";
                 BD_PWM_NVE_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_NVE_Result.Text = "Fail";
                 BD_PWM_NVE_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_Freq_Result)
-            {
+            if (result_State_B_to_D.PWM_Freq_Result) {
                 BD_PWM_Freq_Result.Text = "Pass";
                 BD_PWM_Freq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_Freq_Result.Text = "Fail";
                 BD_PWM_Freq_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_DutyCycle_Result)
-            {
+            if (result_State_B_to_D.PWM_DutyCycle_Result) {
                 BD_PWM_Duty_Result.Text = "Pass";
                 BD_PWM_Duty_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_Duty_Result.Text = "Fail";
                 BD_PWM_Duty_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_Imax_Result)
-            {
+            if (result_State_B_to_D.PWM_Imax_Result) {
                 BD_PWM_Imax_Result.Text = "Pass";
                 BD_PWM_Imax_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_Imax_Result.Text = "Fail";
                 BD_PWM_Imax_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.Voltage_Result)
-            {
+            if (result_State_B_to_D.Voltage_Result) {
                 BD_Voltage_Result.Text = "Pass";
                 BD_Voltage_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_Voltage_Result.Text = "Fail";
                 BD_Voltage_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.MainsOnDelay_Result)
-            {
+            if (result_State_B_to_D.MainsOnDelay_Result) {
                 BD_PWM_OnDel_Result.Text = "Pass";
                 BD_PWM_OnDel_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_OnDel_Result.Text = "Fail";
                 BD_PWM_OnDel_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.MainsFreq_Result)
-            {
+            if (result_State_B_to_D.MainsFreq_Result) {
                 BD_PWM_MainFreq_Result.Text = "Pass";
                 BD_PWM_MainFreq_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PWM_MainFreq_Result.Text = "Fail";
                 BD_PWM_MainFreq_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PP_Result)
-            {
+            if (result_State_B_to_D.PP_Result) {
                 BD_PP_Result.Text = "Pass";
                 BD_PP_Result.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 BD_PP_Result.Text = "Fail";
                 BD_PP_Result.ForeColor = Color.Red;
             }
 
             // Front page
-            
+
 
             D_PWM_Pk.Text = BD_PWM_Amp.Text;
             D_PWM_nPk.Text = BD_PWM_NVE.Text;
@@ -990,6 +834,11 @@ namespace EV_Testing_report_DEMO
             D_PWM_MainVolt_sts.ForeColor = BD_Voltage_Result.ForeColor;
             D_PWM_MainFreq_sts.ForeColor = BD_PWM_MainFreq_Result.ForeColor;
             D_PWM_PP_sts.ForeColor = BD_PP_Result.ForeColor;
+
+            update_Freq_CD(result_State_B_to_D.PWM_Freq + " Hz");
+            update_Duty_CD(result_State_B_to_D.PWM_DutyCycle + " %");
+            update_Vmax_CD(result_State_B_to_D.PWM_Amplitude + " V");
+            update_Vmin_CD(result_State_B_to_D.PWM_NveAmplitude + " V");
             // BD_PWM_Startup_Result
             // BD_PWM_Amp_Result
             // BD_PWM_NVE_Result
@@ -1002,73 +851,56 @@ namespace EV_Testing_report_DEMO
             // BD_PP_Result
         }
 
-        void read_result_RCD(RCD0 s_rcd)
-        {
+        void read_result_RCD(RCD0 s_rcd) {
 
             result_rcd_test = s_rcd;
 
-            if (RCD_TripTime.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (RCD_TripTime.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_RCD(s_rcd);
                 };
                 RCD_TripTime.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 RCD_TripTime.Text = result_rcd_test.Trip_Time + " ms";
             }
             RCD_Limit.Text = result_rcd_test.Limit + " ms";
             RCD_Current.Text = result_rcd_test.Current + " mA";
 
-            if (result_rcd_test.RCD0_Result)
-            {
+            if (result_rcd_test.RCD0_Result) {
                 RCD_check.Text = "Pass";
                 RCD_check.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 RCD_check.Text = "Fail";
                 RCD_check.ForeColor = Color.Red;
             }
 
             // Front Page
-            
+
             RCD_TestingInjectedCurrent.Text = RCD_Current.Text;
-            RCD_Accecptable_TripTime.Text = RCD_Limit.Text;            
+            RCD_Accecptable_TripTime.Text = RCD_Limit.Text;
             RCD_TripTime_ms.Text = RCD_TripTime.Text;
             RCD_TripTime_ms_sts.Text = RCD_check.Text;
             RCD_TripTime_ms_sts.ForeColor = RCD_check.ForeColor;
 
         }
-        void read_result_Diode(Diode_Test s_diode)
-        {
+        void read_result_Diode(Diode_Test s_diode) {
 
             result_diode_test = s_diode;
 
-            if (DiodeShort_Delay.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (DiodeShort_Delay.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_Diode(s_diode);
                 };
                 DiodeShort_Delay.Invoke(add_str);
-            }
-            else
-            {
+            } else {
 
-                if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Short)
-                {
+                if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Short) {
                     diode_TestCMD = Diode_Test_ENUM.notTesting;
                     DiodeShort_Delay.Text = result_diode_test.Diode_ShortCircuit_MainsOffDelay + " ms";
-                    if (result_diode_test.Diode_ShortCircuit_Result)
-                    {
+                    if (result_diode_test.Diode_ShortCircuit_Result) {
                         Diode_Short_check.Text = "Pass";
                         Diode_Short_check.ForeColor = Color.Green;
-                    }
-                    else
-                    {
+                    } else {
                         Diode_Short_check.Text = "Fail";
                         Diode_Short_check.ForeColor = Color.Red;
                     }
@@ -1077,32 +909,24 @@ namespace EV_Testing_report_DEMO
 
             }
 
-            if (diode_TestCMD == Diode_Test_ENUM.TestPE_Open)
-            {
+            if (diode_TestCMD == Diode_Test_ENUM.TestPE_Open) {
                 diode_TestCMD = Diode_Test_ENUM.notTesting;
                 PE_Open_Delay.Text = result_diode_test.PE_OpenCircuit_MainsOffDelay + " ms";
-                if (result_diode_test.PE_OpenCircuit_Result)
-                {
+                if (result_diode_test.PE_OpenCircuit_Result) {
                     PE_Open_check.Text = "Pass";
                     PE_Open_check.ForeColor = Color.Green;
-                }
-                else
-                {
+                } else {
                     PE_Open_check.Text = "Fail";
                     PE_Open_check.ForeColor = Color.Red;
                 }
             }
-            if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Open)
-            {
+            if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Open) {
                 diode_TestCMD = Diode_Test_ENUM.notTesting;
                 DiodeOpen_Delay.Text = result_diode_test.Diode_OpenCircuit_MainsOffDelay + " ms";
-                if (result_diode_test.Diode_OpenCircuit_Result)
-                {
+                if (result_diode_test.Diode_OpenCircuit_Result) {
                     DiodeOpen_check.Text = "Pass";
                     DiodeOpen_check.ForeColor = Color.Green;
-                }
-                else
-                {
+                } else {
                     DiodeOpen_check.Text = "Fail";
                     DiodeOpen_check.ForeColor = Color.Red;
                 }
@@ -1123,101 +947,76 @@ namespace EV_Testing_report_DEMO
 
 
         }
-        void read_result_Insulator(Insulation_Test s_insu)
-        {
+        void read_result_Insulator(Insulation_Test s_insu) {
 
             Insulation_Test = s_insu;
 
-            if (Insulator_Limit.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (Insulator_Limit.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_Insulator(s_insu);
                 };
                 Insulator_Limit.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 Insulator_Limit.Text = Insulation_Test.N_PE + " Ω";
             }
             Insulator_Result.Text = Insulation_Test.L_PE + " Ω";
             Insulator_Volt.Text = Insulation_Test.Voltage + " V";
 
-            if (Insulation_Test.Insulation_Testing)
-            {
+            if (Insulation_Test.Insulation_Testing) {
                 Insu_check.Text = "Pass";
                 Insu_check.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 Insu_check.Text = "Fail";
                 Insu_check.ForeColor = Color.Red;
             }
 
         }
 
-        void read_result_LinePE(Insulation_Test s_insu)
-        {
+        void read_result_LinePE(Insulation_Test s_insu) {
             Insulation_Test = s_insu;
 
-            if (Insulator_Limit.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (Insulator_Limit.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_Insulator(s_insu);
                 };
                 Insulator_Limit.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 Insulator_Result.Text = Insulation_Test.L_PE + " Ω";
             }
 
             Insulator_Volt.Text = Insulation_Test.Voltage + " V";
 
-            if (Insulation_Test.Insulation_Testing)
-            {
+            if (Insulation_Test.Insulation_Testing) {
                 Insu_check.Text = "Pass";
                 Insu_check.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 Insu_check.Text = "Fail";
                 Insu_check.ForeColor = Color.Red;
             }
         }
-        void read_result_NeutPE(Insulation_Test s_insu)
-        {
+        void read_result_NeutPE(Insulation_Test s_insu) {
             Insulation_Test = s_insu;
 
-            if (Insulator_Limit.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (Insulator_Limit.InvokeRequired) {
+                Action add_str = delegate {
                     read_result_Insulator(s_insu);
                 };
                 Insulator_Limit.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 Insulator_Limit.Text = Insulation_Test.N_PE + " Ω";
             }
             Insulator_Volt.Text = Insulation_Test.Voltage + " V";
 
-            if (Insulation_Test.Insulation_Testing)
-            {
+            if (Insulation_Test.Insulation_Testing) {
                 Insu_check.Text = "Pass";
                 Insu_check.ForeColor = Color.Green;
-            }
-            else
-            {
+            } else {
                 Insu_check.Text = "Fail";
                 Insu_check.ForeColor = Color.Red;
             }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
+        private void Form1_Load(object sender, EventArgs e) {
             clearS_AB();
             clearS_BC();
             clearS_CB();
@@ -1227,8 +1026,7 @@ namespace EV_Testing_report_DEMO
             clearInsu();
         }
 
-        private void updateStatus_BTN()
-        {
+        private void updateStatus_BTN() {
             //bool en = true;
             bool en = isTemplateSelected;
             /*
@@ -1238,16 +1036,12 @@ namespace EV_Testing_report_DEMO
             }*/
 
 
-            if (ExportPDF.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (ExportDOCX.InvokeRequired) {
+                Action add_str = delegate {
                     updateStatus_BTN();
                 };
-                ExportPDF.Invoke(add_str);
-            }
-            else
-            {
+                ExportDOCX.Invoke(add_str);
+            } else {
                 // ExportPDF.Enabled = en;
                 ExportDOCX.Enabled = en;
             }
@@ -1255,336 +1049,79 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        private void Test_AB_Click(object sender, EventArgs e)
-        {
+        private void Test_AB_Click(object sender, EventArgs e) {
             scan_read = false;
 
             hook_Test_AB();
             Enable_All_Test_BTN(false);
         }
 
-        private void Test_BC_Click(object sender, EventArgs e)
-        {
+        private void Test_BC_Click(object sender, EventArgs e) {
             scan_read = false;
 
             hook_Test_BC();
             Enable_All_Test_BTN(false);
         }
 
-        private void Test_CB_Click(object sender, EventArgs e)
-        {
+        private void Test_CB_Click(object sender, EventArgs e) {
             scan_read = false;
 
             hook_Test_CB();
             Enable_All_Test_BTN(false);
         }
 
-        private void Test_BD_Click(object sender, EventArgs e)
-        {
+        private void Test_BD_Click(object sender, EventArgs e) {
             scan_read = false;
             hook_Test_BD();
             Enable_All_Test_BTN(false);
         }
 
-        private void Test_RCD_Click(object sender, EventArgs e)
-        {
+        private void Test_RCD_Click(object sender, EventArgs e) {
             hook_Test_RCD();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void Test_Insulat_Click(object sender, EventArgs e)
-        {
+        private void Test_Insulat_Click(object sender, EventArgs e) {
             hook_Test_Insulator();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
+        private void button1_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestDiode_Short;
             hook_Test_Diode();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void Test_PE_open_Click(object sender, EventArgs e)
-        {
+        private void Test_PE_open_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestPE_Open;
             hook_Test_PE_Open();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void Test_diode_open_Click(object sender, EventArgs e)
-        {
+        private void Test_diode_open_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestDiode_Open;
             hook_Test_DiodeOpen();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
-        private void TestL_PE_Click(object sender, EventArgs e)
-        {
+        private void TestL_PE_Click(object sender, EventArgs e) {
             hook_Test_LinePE();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void TestN_PE_Click(object sender, EventArgs e)
-        {
+        private void TestN_PE_Click(object sender, EventArgs e) {
             hook_Test_NeutPE();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
-        private void hook_Test_AB()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("State_A_to_B\n");
-                    receive_present_state = ReportReceive_states.Req_AB;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    if (scan_read)
-                    {
-                        send_Bluetooth("State_A_to_B\n");
-                    }
-                    else
-                    {
-                        send_Bluetooth("State_A_to_B_Single\n");
-                    }
-                    read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-                    if (scan_read)
-                    {
-                        hook_Test_BC();
-                    }
 
-                    break;
-            }
-        }
-        private void hook_Test_BC()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("State_B_to_C\n");
-                    receive_present_state = ReportReceive_states.Req_BC;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    if (scan_read)
-                    {
-                        send_Bluetooth("State_B_to_C\n");
-                    }
-                    else
-                    {
-                        send_Bluetooth("State_B_to_C_Single\n");
-                    }
-
-                    read_result_B_to_C(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-                    if (scan_read)
-                    {
-                        hook_Test_BD();
-                    }
-
-                    break;
-            }
-
-        }
-        private void hook_Test_CB()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("State_C_to_B\n");
-                    receive_present_state = ReportReceive_states.Req_CB;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    if (scan_read)
-                    {
-                        send_Bluetooth("State_C_to_B\n");
-                    }
-                    else
-                    {
-                        send_Bluetooth("State_C_to_B_Single\n");
-                    }
-
-                    read_result_C_to_B(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-
-                    Enable_All_Test_BTN(true);
-                    scan_read = false;
-                    break;
-            }
-
-        }
-        private void hook_Test_BD()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("State_B_to_D\n");
-                    receive_present_state = ReportReceive_states.Req_BD;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    if (scan_read)
-                    {
-                        send_Bluetooth("State_B_to_D\n");
-                    }
-                    else
-                    {
-                        send_Bluetooth("State_B_to_D_Single\n");
-                    }
-
-                    read_result_B_to_D(JsonSerializer.Deserialize<State_Transition_Test>(receive_Bluetooth()));
-
-                    if (scan_read)
-                    {
-                        hook_Test_CB();
-                    }
-
-                    break;
-            }
-
-        }
-        private void hook_Test_RCD()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("RCD0_Test\n");
-                    receive_present_state = ReportReceive_states.Req_RCD;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("RCD0_Test\n");
-
-                    read_result_RCD(JsonSerializer.Deserialize<RCD0>(receive_Bluetooth()));
-                    break;
-            }
-
-        }
-        private void hook_Test_Insulator()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("Insulator_Test\n");
-                    receive_present_state = ReportReceive_states.Req_Insul;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("Insulator_Test\n");
-
-                    read_result_Insulator(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
-                    break;
-            }
-
-        }
-        private void hook_Test_LinePE()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("Test_LinePE\n");
-                    receive_present_state = ReportReceive_states.Req_Insul;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("Test_LinePE\n");
-
-                    read_result_LinePE(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
-                    break;
-            }
-        }
-        private void hook_Test_NeutPE()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("Test_NeutralPE\n");
-                    receive_present_state = ReportReceive_states.Req_Insul;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("Test_NeutralPE\n");
-
-                    read_result_NeutPE(JsonSerializer.Deserialize<Insulation_Test>(receive_Bluetooth()));
-                    break;
-            }
-        }
-        private void hook_Test_Diode()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("Diode_Test\n");
-                    receive_present_state = ReportReceive_states.Req_Diode;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("Diode_Test\n");
-
-                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
-                    break;
-            }
-
-        }
-
-        private void hook_Test_PE_Open()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("PE_Open_Test\n");
-                    receive_present_state = ReportReceive_states.Req_Diode;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("PE_Open_Test\n");
-
-                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
-                    break;
-            }
-
-        }
-
-        private void hook_Test_DiodeOpen()
-        {
-            switch (commu_mode)
-            {
-                case EVSE_Tester_CommunicationMode.None:
-                    break;
-                case EVSE_Tester_CommunicationMode.SerialPort:
-                    esp32_module.WriteLine("Diode_Open_Test\n");
-                    receive_present_state = ReportReceive_states.Req_Diode;
-                    break;
-                case EVSE_Tester_CommunicationMode.Bluetooth:
-                    send_Bluetooth("Diode_Open_Test\n");
-
-                    read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(receive_Bluetooth()));
-                    break;
-            }
-
-
-        }
-
-
-        private void exp_dir_Click(object sender, EventArgs e)
-        {
+        private void exp_dir_Click(object sender, EventArgs e) {
             //DialogResult result = Save_to.ShowDialog();
 
             DialogResult result = SaveReportAs.ShowDialog();
@@ -1592,15 +1129,13 @@ namespace EV_Testing_report_DEMO
             {
                 SaveReportAs.FileName += ".docx";
             }
-            if (result == DialogResult.OK)
-            {
+            if (result == DialogResult.OK) {
                 // Exp_to.Text = Save_to.SelectedPath;
                 Exp_to.Text = SaveReportAs.FileName;
             }
         }
 
-        private void Test_ALL_BTN_Click(object sender, EventArgs e)
-        {
+        private void Test_ALL_BTN_Click(object sender, EventArgs e) {
 
             scan_read = true;
             hook_Test_AB();
@@ -1609,41 +1144,32 @@ namespace EV_Testing_report_DEMO
                 Enable_All_Test_BTN(false);
         }
 
-        private void COM_Input_Enter(object sender, KeyPressEventArgs e)
-        {
+        private void COM_Input_Enter(object sender, KeyPressEventArgs e) {
 
         }
 
-        private void COM_Input_KeyDown(object sender, KeyEventArgs e)
-        {
+        private void COM_Input_KeyDown(object sender, KeyEventArgs e) {
             if (Control.ModifierKeys == Keys.Enter)
                 hook_Connect_ESP();
         }
 
-        private void SerialMoni_TextChanged(object sender, EventArgs e)
-        {
+        private void SerialMoni_TextChanged(object sender, EventArgs e) {
 
         }
 
-        private void cancelBTN_Click(object sender, EventArgs e)
-        {
+        private void cancelBTN_Click(object sender, EventArgs e) {
             receive_present_state = ReportReceive_states.Standby;
             Enable_All_Test_BTN(true);
             scan_read = false;
         }
 
-        void clearS_AB()
-        {
-            if (AB_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearS_AB() {
+            if (AB_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     clearS_AB();
                 };
                 AB_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 AB_PWM_Startup.Text = "-";
             }
 
@@ -1671,18 +1197,13 @@ namespace EV_Testing_report_DEMO
             AB_check.ForeColor = Color.Black;
 
         }
-        void clearS_BC()
-        {
-            if (BC_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearS_BC() {
+            if (BC_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     clearS_BC();
                 };
                 BC_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 BC_PWM_Startup.Text = "-";
             }
 
@@ -1722,18 +1243,13 @@ namespace EV_Testing_report_DEMO
             BC_PWM_MainFreq_Result.ForeColor = Color.Black;
             BC_PP_Result.ForeColor = Color.Black;
         }
-        void clearS_CB()
-        {
-            if (CB_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearS_CB() {
+            if (CB_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     clearS_CB();
                 };
                 CB_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 CB_PWM_Startup.Text = "-";
             }
 
@@ -1763,18 +1279,13 @@ namespace EV_Testing_report_DEMO
             CB_check.Text = "(-)";
             CB_check.ForeColor = Color.Black;
         }
-        void clearS_BD()
-        {
-            if (BD_PWM_Startup.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearS_BD() {
+            if (BD_PWM_Startup.InvokeRequired) {
+                Action add_str = delegate {
                     clearS_BD();
                 };
                 BD_PWM_Startup.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 BD_PWM_Startup.Text = "-";
             }
 
@@ -1825,18 +1336,13 @@ namespace EV_Testing_report_DEMO
             BD_PWM_MainFreq_Result.ForeColor = Color.Black;
             BD_PP_Result.ForeColor = Color.Black;
         }
-        void clearDiode()
-        {
-            if (DiodeShort_Delay.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearDiode() {
+            if (DiodeShort_Delay.InvokeRequired) {
+                Action add_str = delegate {
                     clearDiode();
                 };
                 DiodeShort_Delay.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 DiodeShort_Delay.Text = "-";
             }
             PE_Open_Delay.Text = "-";
@@ -1854,19 +1360,14 @@ namespace EV_Testing_report_DEMO
             DiodeOpen_check.ForeColor = Color.Black;
 
         }
-        void clearRCD()
-        {
+        void clearRCD() {
 
-            if (RCD_TripTime.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+            if (RCD_TripTime.InvokeRequired) {
+                Action add_str = delegate {
                     clearRCD();
                 };
                 RCD_TripTime.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 RCD_TripTime.Text = "-";
             }
             RCD_Limit.Text = "-";
@@ -1876,18 +1377,13 @@ namespace EV_Testing_report_DEMO
             RCD_check.ForeColor = Color.Black;
 
         }
-        void clearInsu()
-        {
-            if (Insulator_Limit.InvokeRequired)
-            {
-                Action add_str = delegate
-                {
+        void clearInsu() {
+            if (Insulator_Limit.InvokeRequired) {
+                Action add_str = delegate {
                     clearInsu();
                 };
                 Insulator_Limit.Invoke(add_str);
-            }
-            else
-            {
+            } else {
                 Insulator_Limit.Text = "-";
             }
             Insulator_Result.Text = "-";
@@ -1898,8 +1394,7 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        private void ClrResult_Click(object sender, EventArgs e)
-        {
+        private void ClrResult_Click(object sender, EventArgs e) {
             clearS_AB();
             clearS_BC();
             clearS_CB();
@@ -1909,8 +1404,7 @@ namespace EV_Testing_report_DEMO
             clearInsu();
         }
 
-        private void ExportDOCX_Click(object sender, EventArgs e)
-        {
+        private void ExportDOCX_Click(object sender, EventArgs e) {
             // using(WordDocument doc = new WordDocument())
             // {
             //     doc.EnsureMinimal();
@@ -1931,8 +1425,7 @@ namespace EV_Testing_report_DEMO
             DialogResult result = SaveReportAs.ShowDialog();
             string saveto_dir = "";
             // If selected save dir then savefile otherwise do nothing
-            if (result == DialogResult.OK)
-            {
+            if (result == DialogResult.OK) {
                 /*
                 MiniWordColorText ab_testing_result;
                 MiniWordColorText bc_testing_result;
@@ -2031,25 +1524,19 @@ namespace EV_Testing_report_DEMO
                 MiniWordColorText pe_op_result;
                 MiniWordColorText diode_op_result;
 
-                if (result_diode_test.Diode_ShortCircuit_Result) { diode_sh_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
-                else { diode_sh_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
-                if (result_diode_test.PE_OpenCircuit_Result) { pe_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
-                else { pe_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
-                if (result_diode_test.Diode_OpenCircuit_Result) { diode_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
-                else { diode_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+                if (result_diode_test.Diode_ShortCircuit_Result) { diode_sh_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_sh_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+                if (result_diode_test.PE_OpenCircuit_Result) { pe_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { pe_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+                if (result_diode_test.Diode_OpenCircuit_Result) { diode_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
                 MiniWordColorText rcd_testing_result;
-                if (result_rcd_test.RCD0_Result) { rcd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
-                else { rcd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+                if (result_rcd_test.RCD0_Result) { rcd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { rcd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
                 MiniWordColorText insulation_testing_result;
-                if (Insulation_Test.Insulation_Testing) { insulation_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
-                else { insulation_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+                if (Insulation_Test.Insulation_Testing) { insulation_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { insulation_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
 
 
-                var value = new Dictionary<string, object>()
-                {
+                var value = new Dictionary<string, object>() {
                     // State A to B testing Result
                     //["AB_Result"] = ab_testing_result,
                     ["AB_StDel"] = result_State_A_to_B.PWM_StartupDelay + " ms",
@@ -2186,11 +1673,9 @@ namespace EV_Testing_report_DEMO
 
         }
 
-        private void SelTelp_Click(object sender, EventArgs e)
-        {
+        private void SelTelp_Click(object sender, EventArgs e) {
             DialogResult result = WordTemplate.ShowDialog();
-            if (result == DialogResult.OK)
-            {
+            if (result == DialogResult.OK) {
                 ExportDOCX.Text = "Export Report DOCX";
                 ExportDOCX.Enabled = true;
                 //Exp_to.Text = Save_to.SelectedPath;
@@ -2198,13 +1683,11 @@ namespace EV_Testing_report_DEMO
             }
         }
 
-        private void Save_to_HelpRequest(object sender, EventArgs e)
-        {
+        private void Save_to_HelpRequest(object sender, EventArgs e) {
 
         }
 
-        private void Select_File_word(object sender, CancelEventArgs e)
-        {
+        private void Select_File_word(object sender, CancelEventArgs e) {
             isTemplateSelected = true;
             ExportDOCX.Text = "Export Report DOCX";
             ExportDOCX.Enabled = true;
@@ -2212,434 +1695,45 @@ namespace EV_Testing_report_DEMO
             Templ_from.Text = WordTemplate.FileName;
         }
 
-        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
-        {
+        private void saveFileDialog1_FileOk(object sender, CancelEventArgs e) {
 
         }
 
-
-
-        /*
-private void Req_report_Click(object sender, EventArgs e)
-{
-var Package_request = new Request_Testing_Result
-{
-Package_req = "State_B_to_C"
-};
-}*/
-        private void ExportPDF_Click(object sender, EventArgs e)
-        {
-            //ExportPDF.Text = Save_to.SelectedPath;
-            String html_to_export = "";
-
-            html_to_export += "<p><img style=\"float: right;\" src=\"https://www.eng.kmutnb.ac.th/wp-content/uploads/2019/08/LOGO-KMUTNB--300x300.png\" alt=\"\" width=\"200\" height=\"200\" /></p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">King Mongkut's University of Technology North Bangkok</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">1518 Pracharat 1 Road, Wongsawang, Bangsue, Bangkok 10800</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Tel. 02-555-2000 Ext. 8518-8520</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Email: <a href=\"mailto:teratam.b@eng.kmutnb.ac.th\">teratam.b@eng.kmutnb.ac.th</a></p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<hr style=\"padding-left: 60px;\" /><hr style=\"padding-left: 40px;\" />";
-            html_to_export += "<h2 style=\"padding-left: 60px; text-align: justify;\"><strong>Power System Laboratory</strong></h2>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">Department of Engineering and Computer Engineering</p>";
-            html_to_export += "<hr style=\"padding-left: 60px;\" />";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<h1 style=\"padding-left: 60px; text-align: justify;\">รายงานผลการทดสอบเครื่องชาร์จรถยนต์ไฟฟ้าแบบกระแสสลับ</h1>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">เสนอ</p>";
-            html_to_export += "<h3 style=\"padding-left: 60px; text-align: justify;\">บริษัท IBS Corporation จำกัด</h4>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">&nbsp;</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">โดย</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">ภาควิชาวิศวกรรมไฟฟ้าและคอมพิวเตอร์ คณะวิศวกรรมศาสตร์</p>";
-            html_to_export += "<p style=\"padding-left: 60px; text-align: justify;\">มหาวิทยาลัยเทคโนโลยีพระจอมเกล้าพระนครเหนือ</p>";
-
-            html_to_export += "<p>&#13;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State A to B : ";
-            /*
-            if (result_State_A_to_B.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            */
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_A_to_B.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State B to C : ";
-            /*
-            if (result_State_B_to_C.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }*/
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains On Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsOnDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Mains Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_B_to_C.MainsFreq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>State C to B : ";
-            /*
-            if (result_State_C_to_B.Testing_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            */
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Startup Delay</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_StartupDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Amplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Nve Amplitude</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_NveAmplitude + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Freq</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Freq + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Duty Cycle</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_DutyCycle + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">PWM Imax</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_State_C_to_B.PWM_Imax + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"border-collapse: collapse; width: 100%; height: 273px;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Short Circuit : ";
-            if (result_diode_test.Diode_ShortCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_ShortCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Short Circuit Ground : ";
-            if (result_diode_test.PE_OpenCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.PE_OpenCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Diode Open Circuit : ";
-            if (result_diode_test.Diode_OpenCircuit_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">Mains Off Delay</td>";
-            html_to_export += "<td style=\"width: 50%; height: 18px; padding-left: 40px;\">" + result_diode_test.Diode_OpenCircuit_MainsOffDelay + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Rcd0 : ";
-            if (result_rcd_test.RCD0_Result)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Trip Time</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Trip_Time + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Limit</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Limit + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Current</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + result_rcd_test.Current + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-            html_to_export += "<p>&nbsp;</p>";
-
-            html_to_export += "<table style=\"height: 181px; width: 100%; border-collapse: collapse; margin-left: auto; margin-right: auto;\" border=\"1\">";
-            html_to_export += "<tbody>";
-            html_to_export += "<tr style=\"height: 73px;\">";
-            html_to_export += "<td style=\"width: 50%; text-align: center; height: 73px;\" colspan=\"2\">";
-            html_to_export += "<h1>Insulation Test : ";
-            if (Insulation_Test.Insulation_Testing)
-            {
-                html_to_export += "Pass";
-            }
-            else
-            {
-                html_to_export += "Fail";
-            }
-            html_to_export += "</h1>";
-            html_to_export += "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">L-PE</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.L_PE + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">N-PE</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.N_PE + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "<tr style=\"height: 18px;\">";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">Voltage</td>";
-            html_to_export += "<td style=\"width: 50%; padding-left: 40px; height: 18px;\">" + Insulation_Test.Voltage + "</td>";
-            html_to_export += "</tr>";
-            html_to_export += "</tbody>";
-            html_to_export += "</table>";
-
-            /*
-            <table style="border-collapse: collapse; width: 30%; height: 100px;" border="1">
-            <tbody>
-            <tr style="height: 19px;">
-            <td style="width: 50%; text-align: center; height: 19px;">Value</td>
-            <td style="width: 50%; text-align: center; height: 19px;">Data</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 1</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 2</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            <tr style="height: 31px;">
-            <td style="width: 50%; text-align: center; height: 31px;">Val 3</td>
-            <td style="width: 50%; text-align: center; height: 31px;">&nbsp;</td>
-            </tr>
-            </tbody>
-            </table>
-             
-             */
-
-            //var pdf_file = new ChromePdfRenderer();
-            // instantiate a html to pdf converter object
-            HtmlToPdf pdf_file = new HtmlToPdf();
-            pdf_file.Options.PdfPageSize = PdfPageSize.A4;
-            pdf_file.Options.PdfPageOrientation = PdfPageOrientation.Portrait;
-            pdf_file.Options.MarginBottom = 14;
-            pdf_file.Options.MarginTop = 12;
-            pdf_file.Options.MarginLeft = 10;
-            pdf_file.Options.MarginRight = 10;
-
-
-            //= pdf_file.RenderHtmlAsPdf(html_to_export);
-            PdfDocument doc = pdf_file.ConvertHtmlString(html_to_export);
-
-
-
-            doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.pdf");
-            doc.Close();
-        }
-
-        private void onDropdown(object sender, EventArgs e)
-        {
+        private void onDropdown(object sender, EventArgs e) {
             scanBluetooth();
         }
 
-        private void scanBluetooth()
-        {
+        private void scanBluetooth() {
             Bluetooth_Devices_List.Items.Clear();
             // Scan Bluetooth
             devices = client.DiscoverDevicesInRange();
 
-            foreach (BluetoothDeviceInfo deviceI in devices)
-            {
+            foreach (BluetoothDeviceInfo deviceI in devices) {
                 Bluetooth_Devices_List.Items.Add(deviceI.DeviceName);
             }
         }
 
-        private void onsel_Bluetooth(object sender, EventArgs e)
-        {
+        private void onsel_Bluetooth(object sender, EventArgs e) {
             //indx_sel.Text = Bluetooth_Devices_List.SelectedIndex.ToString();
-            try
-            {
+            try {
                 Selected_Device = devices[Bluetooth_Devices_List.SelectedIndex];
                 Bluetooth_Connect.Enabled = true;
                 Bluetooth_Devices_List.Text = Selected_Device.DeviceName;
-            }
-            catch (IndexOutOfRangeException ex)
-            {
+            } catch (IndexOutOfRangeException ex) {
 
             }
 
         }
 
-        private void Bluetooth_Connect_Click(object sender, EventArgs e)
-        {
-            if (!bluetooth_connecting)
-            {
-                try
-                {
+        private void Bluetooth_Connect_Click(object sender, EventArgs e) {
+            if (!bluetooth_connecting) {
+                try {
                     Bluetooth_Devices_List.Enabled = false;
                     Bluetooth_Connect.Text = "Connecting...";
-                }
-                catch (Exception)
-                {
+                } catch (Exception) {
 
-                }
-                finally
-                {
-                    try
-                    {
+                } finally {
+                    try {
                         BluetoothEndPoint endPoint = new BluetoothEndPoint(Selected_Device.DeviceAddress, BluetoothService.SerialPort);
                         client.Connect(endPoint);
                         bluetoothStream = client.GetStream();
@@ -2657,9 +1751,7 @@ Package_req = "State_B_to_C"
 
                         TestingMode.Visible = true;
 
-                    }
-                    catch (Exception)
-                    {
+                    } catch (Exception) {
                         Bluetooth_Connect.Text = "Connect";
                         Bluetooth_Devices_List.Enabled = true;
                         updateESP32_Connection_Status(false);
@@ -2672,9 +1764,7 @@ Package_req = "State_B_to_C"
                         commu_mode = EVSE_Tester_CommunicationMode.None;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 Bluetooth_Connect.Text = "Connect";
                 Bluetooth_Devices_List.Enabled = true;
                 client.Close();
@@ -2696,10 +1786,8 @@ Package_req = "State_B_to_C"
 
         }
 
-        private void TestBluetooth_Click(object sender, EventArgs e)
-        {
-            if (bluetoothStream.CanWrite)
-            {
+        private void TestBluetooth_Click(object sender, EventArgs e) {
+            if (bluetoothStream.CanWrite) {
                 string message = "Hello, Bluetooth!";
                 byte[] messageBuffer = Encoding.ASCII.GetBytes(message);
                 bluetoothStream.Write(messageBuffer, 0, messageBuffer.Length);
@@ -2710,16 +1798,12 @@ Package_req = "State_B_to_C"
             }
         }
 
-        private void send_Bluetooth(string str)
-        {
-            try
-            {
+        private void send_Bluetooth(string str) {
+            try {
                 byte[] msg = Encoding.ASCII.GetBytes(str);
                 bluetoothStream.Write(msg, 0, msg.Length);
                 bluetoothStream.Flush();
-            }
-            catch (IOException ex)
-            {
+            } catch (IOException ex) {
                 Bluetooth_Connect.Text = "Connect";
                 Bluetooth_Devices_List.Enabled = true;
                 updateESP32_Connection_Status(false);
@@ -2731,44 +1815,31 @@ Package_req = "State_B_to_C"
             }
 
         }
-        private string receive_Bluetooth()
-        {
+        private string receive_Bluetooth() {
             string indata = "";
             int rem_;
             char lastCh;
             bool endJson = false;
-            do
-            {
-                try
-                {
+            do {
+                try {
                     rem_ = bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
-                    if (rem_ != 0)
-                    {
+                    if (rem_ != 0) {
                         lastCh = (char)receiveBuffer[rem_ - 1];
-                        if (lastCh == '}')
-                        {
+                        if (lastCh == '}') {
                             endJson = true;
-                        }
-                        else
-                        {
-                            for (UInt32 i = 0; i < rem_; i++)
-                            {
-                                if ((char)receiveBuffer[i] == '}')
-                                {
+                        } else {
+                            for (UInt32 i = 0; i < rem_; i++) {
+                                if ((char)receiveBuffer[i] == '}') {
                                     endJson = true;
                                     break;
                                 }
                             }
                         }
                         indata += Encoding.ASCII.GetString(receiveBuffer, 0, rem_);
-                    }
-                    else
-                    {
+                    } else {
                         endJson = true;
                     }
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
 
                 }
 
@@ -2779,27 +1850,55 @@ Package_req = "State_B_to_C"
             addTextToSerialMon(indata);
             return indata;
         }
+        private string receive_Array_Bluetooth() {
+            string indata = "";
+            int rem_;
+            char lastCh;
+            bool endJson = false;
+            do {
+                try {
+                    rem_ = bluetoothStream.Read(receiveBuffer, 0, receiveBuffer.Length);
+                    if (rem_ != 0) {
+                        lastCh = (char)receiveBuffer[rem_ - 1];
+                        if (lastCh == ']') {
+                            endJson = true;
+                        } else {
+                            for (UInt32 i = 0; i < rem_; i++) {
+                                if ((char)receiveBuffer[i] == ']') {
+                                    endJson = true;
+                                    break;
+                                }
+                            }
+                        }
+                        indata += Encoding.ASCII.GetString(receiveBuffer, 0, rem_);
+                    } else {
+                        endJson = true;
+                    }
+                } catch (IOException e) {
+
+                }
 
 
-        private void INJ_readCP_Click(object sender, EventArgs e)
-        {
+            } while (!endJson);
+
+            return indata;
+        }
+
+
+        private void INJ_readCP_Click(object sender, EventArgs e) {
             send_Bluetooth("read_CP\n");
         }
 
-        private void INJ_readPP_Click(object sender, EventArgs e)
-        {
+        private void INJ_readPP_Click(object sender, EventArgs e) {
             send_Bluetooth("read_PP\n");
         }
 
-        private void INJ_readINS_Click(object sender, EventArgs e)
-        {
+        private void INJ_readINS_Click(object sender, EventArgs e) {
             send_Bluetooth("read_INS\n");
         }
 
-        private void ManualTestBTN_Click(object sender, EventArgs e)
-        {
-            switch (manual_State)
-            {
+        private void ManualTestBTN_Click(object sender, EventArgs e) {
+            switch (manual_State) {
                 case EVSE_Manual_State.EV_State_A:
                     break;
                 case EVSE_Manual_State.EV_State_B:
@@ -2817,10 +1916,8 @@ Package_req = "State_B_to_C"
             }
         }
 
-        void updateManualState()
-        {
-            switch (manual_State)
-            {
+        void updateManualState() {
+            switch (manual_State) {
                 case EVSE_Manual_State.EV_State_A:
                     selectState_A.Enabled = true;
                     selectState_B.Enabled = true;
@@ -2831,64 +1928,31 @@ Package_req = "State_B_to_C"
                     selectState_A.Enabled = true;
                     selectState_B.Enabled = true;
                     selectState_C.Enabled = true;
-                    selectState_D.Enabled = true;
+                    selectState_D.Enabled = false;
                     break;
                 case EVSE_Manual_State.EV_State_C:
                     selectState_A.Enabled = false;
                     selectState_B.Enabled = true;
                     selectState_C.Enabled = true;
-                    selectState_D.Enabled = false;
+                    selectState_D.Enabled = true;
                     break;
                 case EVSE_Manual_State.EV_State_D:
                     selectState_A.Enabled = false;
-                    selectState_B.Enabled = true;
-                    selectState_C.Enabled = false;
+                    selectState_B.Enabled = false;
+                    selectState_C.Enabled = true;
                     selectState_D.Enabled = true;
                     break;
             }
         }
 
-        private void selectState_A_CheckedChanged(object sender, EventArgs e)
-        {
 
-        }
-
-        private void selectState_B_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void selectState_C_CheckedChanged(object sender, EventArgs e)
-        {
-
-
-        }
-
-        private void selectState_D_CheckedChanged(object sender, EventArgs e)
-        {
-
-
-        }
-
-        private void TestingMode_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-
-        }
-
-        private void TestingMode_TextUpdate(object sender, EventArgs e)
-        {
-
-        }
-
-        private void TestingMode_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (TestingMode.Text == "Manual")
-            {
-                //ManualTestBTN.Visible = true;
-                //selectState_A.Visible = true;
-                //selectState_B.Visible = true;
-                //selectState_C.Visible = true;
-                //selectState_D.Visible = true;
+        private void TestingMode_SelectedIndexChanged(object sender, EventArgs e) {
+            if (TestingMode.Text == "Manual") {
+                ManualTestBTN.Visible = true;
+                selectState_A.Visible = true;
+                selectState_B.Visible = true;
+                selectState_C.Visible = true;
+                selectState_D.Visible = true;
 
                 Test_ALL_BTN.Visible = false;
                 cancelBTN.Visible = false;
@@ -2899,14 +1963,12 @@ Package_req = "State_B_to_C"
                 manual_State = EVSE_Manual_State.EV_State_A;
                 updateManualState();
                 selectState_A.Checked = true;
-            }
-            else if (TestingMode.Text == "Auto")
-            {
-                //ManualTestBTN.Visible = false;
-                //selectState_A.Visible = false;
-                //selectState_B.Visible = false;
-                //selectState_C.Visible = false;
-                //selectState_D.Visible = false;
+            } else if (TestingMode.Text == "Auto") {
+                ManualTestBTN.Visible = false;
+                selectState_A.Visible = false;
+                selectState_B.Visible = false;
+                selectState_C.Visible = false;
+                selectState_D.Visible = false;
 
                 Test_ALL_BTN.Visible = true;
                 cancelBTN.Visible = true;
@@ -2917,38 +1979,32 @@ Package_req = "State_B_to_C"
             }
         }
 
-        private void selectState_A_Click(object sender, EventArgs e)
-        {
+        private void selectState_A_Click(object sender, EventArgs e) {
             manual_State = EVSE_Manual_State.EV_State_A;
             updateManualState();
             send_Bluetooth("Force_A");
         }
 
-        private void selectState_B_Click(object sender, EventArgs e)
-        {
+        private void selectState_B_Click(object sender, EventArgs e) {
             manual_State = EVSE_Manual_State.EV_State_B;
             updateManualState();
             send_Bluetooth("Force_B");
         }
 
-        private void selectState_C_Click(object sender, EventArgs e)
-        {
+        private void selectState_C_Click(object sender, EventArgs e) {
             manual_State = EVSE_Manual_State.EV_State_C;
             updateManualState();
             send_Bluetooth("Force_C");
         }
 
-        private void selectState_D_Click(object sender, EventArgs e)
-        {
+        private void selectState_D_Click(object sender, EventArgs e) {
             manual_State = EVSE_Manual_State.EV_State_D;
             updateManualState();
             send_Bluetooth("Force_D");
         }
 
-        private void AutoScheme_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (AutoScheme.SelectedIndex)
-            {
+        private void AutoScheme_SelectedIndexChanged(object sender, EventArgs e) {
+            switch (AutoScheme.SelectedIndex) {
                 case 0:
                     picScheme.Image = Properties.Resources.TestingScheme1;
                     break;
@@ -2958,69 +2014,456 @@ Package_req = "State_B_to_C"
             }
         }
 
-        private void picScheme_Click(object sender, EventArgs e)
-        {
+        private void picScheme_Click(object sender, EventArgs e) {
 
+        }
+
+        private void LoopTimer_Tick(object sender, EventArgs e) {
+
+        }
+
+        private void testingGraphic_Click(object sender, EventArgs e) {
+
+        }
+
+        private void SamplingCP_Click(object sender, EventArgs e) {
+            //CP_Sampling
+            send_Bluetooth("CP_Sampling");
+
+            //Test_CP_Sample
+            //Test_CP_Sample.Text = receive_Array_Bluetooth();
+            String jsonArray = receive_Array_Bluetooth();
+            float[] cp_array_sample = JsonSerializer.Deserialize<float[]>(jsonArray);
+            Test_CP_Sample.Text = cp_array_sample.Length.ToString();
+            //Waveform_pic
+            Waveform_pic.Image = DrawOscilloscope(cp_array_sample, Waveform_pic.Width, Waveform_pic.Height, 50000.0f);
+        }
+
+        public static Bitmap DrawOscilloscope(float[] samples, int width, int height, float samplingRate) {
+            Bitmap bmp = new Bitmap(width, height);
+            using Graphics g = Graphics.FromImage(bmp);
+
+            // Styling
+            g.Clear(Color.Black);
+            Pen gridPen = new Pen(Color.FromArgb(40, 255, 255, 255), 1);
+            Pen axisPen = new Pen(Color.Gray, 1);
+            Pen waveformPen = new Pen(Color.Lime, 1.5f);
+            Font labelFont = new Font("Arial", 10);
+            Brush labelBrush = Brushes.White;
+
+            int margin = 50;
+            int plotWidth = width - margin * 2;
+            int plotHeight = height - margin * 2;
+
+            // Find min/max of samples
+            float min = float.MaxValue, max = float.MinValue;
+            //foreach (var s in samples)
+            //{
+            //    if (s < min) min = s;
+            //    if (s > max) max = s;
+            //}
+
+            max = 15.0f;
+            min = -15.0f;
+
+            float range = max - min;
+            if (range == 0) range = 1;
+
+            // Total duration in microseconds
+            float totalDurationUs = samples.Length * 1000000.0f / samplingRate;
+
+            // Horizontal grid lines & Y-axis labels
+            int gridY = 10;
+            for (int i = 0; i <= gridY; i++) {
+                float y = margin + i * plotHeight / gridY;
+                g.DrawLine(gridPen, margin, y, width - margin, y);
+                float value = max - i * range / gridY;
+                g.DrawString($"{value:0.000}", labelFont, labelBrush, 5, y - 8);
+            }
+
+            // Vertical grid lines & X-axis labels
+            int gridX = 20;  // 11 grid lines → 10 divisions (adjust if needed)
+            for (int i = 0; i <= gridX; i++) {
+                float x = margin + i * plotWidth / gridX;
+                g.DrawLine(gridPen, x, margin, x, height - margin);
+                if ((i % 2) == 0) {
+                    float timeUs = i * totalDurationUs / gridX;
+                    g.DrawString($"{timeUs:0} µs", labelFont, labelBrush, x - 20, height - margin + 5);
+                }
+
+            }
+
+            // Draw bounding box
+            g.DrawRectangle(axisPen, margin, margin, plotWidth, plotHeight);
+
+            // Draw waveform scaled to fit
+            float xScale = (float)plotWidth / (samples.Length - 1);
+            float yScale = (float)plotHeight / range;
+
+            for (int i = 0; i < samples.Length - 1; i++) {
+                float x1 = margin + i * xScale;
+                float y1 = margin + (max - samples[i]) * yScale;
+                float x2 = margin + (i + 1) * xScale;
+                float y2 = margin + (max - samples[i + 1]) * yScale;
+
+                g.DrawLine(waveformPen, x1, y1, x2, y2);
+            }
+
+            return bmp;
+        }
+
+        public static Bitmap DrawFFT_Signal(float[] samples, int width, int height, float samplingRate, double freqMin, double freqMax) {
+            Bitmap bmp = new Bitmap(width, height);
+            using Graphics g = Graphics.FromImage(bmp);
+            // Styling
+            g.Clear(Color.Black);
+            Pen gridPen = new Pen(Color.FromArgb(40, 255, 255, 255), 1);
+            Pen axisPen = new Pen(Color.Gray, 1);
+            Pen fftPen = new Pen(Color.Cyan, 1.5f);
+            Font labelFont = new Font("Arial", 10);
+            Brush labelBrush = Brushes.White;
+
+            int margin = 50;
+            int plotWidth = width - margin * 2;
+            int plotHeight = height - margin * 2;
+
+            // Zero-padding to next power of 2
+            int fftSize = 1;
+            while (fftSize < samples.Length) fftSize <<= 1;
+
+            Complex[] fftBuffer = new Complex[fftSize];
+            for (int i = 0; i < samples.Length; i++)
+                fftBuffer[i] = new Complex(samples[i], 0);
+
+            // Perform FFT (or use DFT_Precise)
+            FFT(fftBuffer);
+
+            // Get magnitude spectrum (first half only)
+            int spectrumSize = fftSize / 2;
+            double[] magnitudes = new double[spectrumSize];
+            for (int i = 0; i < spectrumSize; i++) {
+                magnitudes[i] = fftBuffer[i].Magnitude;
+                magnitudes[i] /= fftSize / 2;
+            }
+
+            // Frequency bin resolution
+            double binResolution = samplingRate / fftSize;
+
+            // Determine bin range for desired frequency window
+            int startBin = (int)(freqMin / binResolution);
+            int endBin = (int)(freqMax / binResolution);
+            if (endBin >= spectrumSize) endBin = spectrumSize - 1;
+
+            int displayBins = endBin - startBin + 1;
+            if (displayBins <= 1) displayBins = 2;
+
+            // Get max magnitude in the selected range
+            double maxMag = magnitudes.Skip(startBin).Take(displayBins).Max();
+            double minMag = 0;
+            double rangeMag = maxMag - minMag;
+            if (rangeMag == 0) rangeMag = 1;
+
+            // Horizontal grid lines & Y-axis labels (magnitude)
+            int gridY = 10;
+            for (int i = 0; i <= gridY; i++) {
+                float y = margin + i * plotHeight / gridY;
+                g.DrawLine(gridPen, margin, y, width - margin, y);
+                double value = maxMag - i * rangeMag / gridY;
+                g.DrawString($"{value:0.00}", labelFont, labelBrush, 5, y - 8);
+            }
+
+            // Vertical grid lines & X-axis labels (frequency)
+            int gridX = 10;
+            for (int i = 0; i <= gridX; i++) {
+                float x = margin + i * plotWidth / gridX;
+                g.DrawLine(gridPen, x, margin, x, height - margin);
+                double freq = freqMin + i * (freqMax - freqMin) / gridX;
+                g.DrawString($"{freq:0} Hz", labelFont, labelBrush, x - 20, height - margin + 5);
+            }
+
+            // Draw bounding box
+            g.DrawRectangle(axisPen, margin, margin, plotWidth, plotHeight);
+
+            // Draw FFT spectrum
+            float xScale = (float)plotWidth / (displayBins - 1);
+            float yScale = (float)plotHeight / (float)rangeMag;
+
+            for (int i = startBin; i < endBin; i++) {
+                float x1 = margin + (i - startBin) * xScale;
+                float y1 = margin + (float)((maxMag - magnitudes[i]) * yScale);
+                float x2 = margin + (i + 1 - startBin) * xScale;
+                float y2 = margin + (float)((maxMag - magnitudes[i + 1]) * yScale);
+
+                g.DrawLine(fftPen, x1, y1, x2, y2);
+            }
+
+            return bmp;
+
+        }
+
+        private static void FFT(Complex[] buffer) {
+            int n = buffer.Length;
+            int bits = (int)Math.Log2(n);
+
+            // Bit reversal
+            for (int i = 0; i < n; i++) {
+                int j = BitReverse(i, bits);
+                if (j > i) {
+                    var temp = buffer[i];
+                    buffer[i] = buffer[j];
+                    buffer[j] = temp;
+                }
+            }
+
+            for (int len = 2; len <= n; len <<= 1) {
+                double angle = -2 * Math.PI / len;
+                Complex wLen = new Complex(Math.Cos(angle), Math.Sin(angle));
+                for (int i = 0; i < n; i += len) {
+                    Complex w = Complex.One;
+                    for (int j = 0; j < len / 2; j++) {
+                        Complex u = buffer[i + j];
+                        Complex v = buffer[i + j + len / 2] * w;
+                        buffer[i + j] = u + v;
+                        buffer[i + j + len / 2] = u - v;
+                        w *= wLen;
+                    }
+                }
+            }
+        }
+        private static int BitReverse(int n, int bits) {
+            int reversed = 0;
+            for (int i = 0; i < bits; i++) {
+                reversed <<= 1;
+                reversed |= (n & 1);
+                n >>= 1;
+            }
+            return reversed;
+        }
+
+        private void FFT_BTN_Click(object sender, EventArgs e) {
+            // Square wave generation
+            float[] signal = new float[16000];
+            float samplingRate = 4000000.0f;
+            Random rnd = new Random();
+            float mag = rnd.NextSingle() * 12.0f;
+
+            int samplesPerPeriod = (int)(samplingRate / 1000.0);       // 4000 samples
+            int halfPeriod = samplesPerPeriod / 2;                     // 2000 samples
+
+            for (int i = 0; i < signal.Length; i++) {
+                signal[i] = (i % samplesPerPeriod < halfPeriod) ? mag : -mag;
+            }
+            //for(int i = 0;i < 4; i++) {
+            //    for (int j = 0; j < 50; j++) {
+            //        if(j < 25)
+            //        {
+            //            signal[50 * i + j] = mag;
+            //        }
+            //        else
+            //        {
+            //            signal[50 * i + j] = -mag;
+            //        }
+            //    }
+            //}
+
+            //CP_B2_Pic.Image = DrawFFT_Signal(signal,CP_B2_Pic.Width,CP_B2_Pic.Height,samplingRate);
+            using (Bitmap fftImage = DrawFFT_Signal(signal, CP_B2_Pic.Width, CP_B2_Pic.Height, samplingRate, 0, 10000)) {
+                CP_B2_Pic.Image?.Dispose(); // Dispose old image if replacing
+                CP_B2_Pic.Image = new Bitmap(fftImage); // Clone if needed
+            }
+        }
+
+        private void TmeDomain_Click(object sender, EventArgs e) {
+            // Square wave generation
+            float[] signal = new float[16000];
+            float samplingRate = 4000000.0f;
+            Random rnd = new Random();
+            float mag = rnd.NextSingle() * 12.0f;
+
+            int samplesPerPeriod = (int)(samplingRate / 1000.0);       // 4000 samples
+            int halfPeriod = samplesPerPeriod / 2;                     // 2000 samples
+
+            for (int i = 0; i < signal.Length; i++) {
+                signal[i] = (i % samplesPerPeriod < halfPeriod) ? mag : -mag;
+            }
+            //for(int i = 0;i < 4; i++) {
+            //    for (int j = 0; j < 50; j++) {
+            //        if(j < 25)
+            //        {
+            //            signal[50 * i + j] = mag;
+            //        }
+            //        else
+            //        {
+            //            signal[50 * i + j] = -mag;
+            //        }
+            //    }
+            //}
+
+            //CP_B2_Pic.Image = DrawFFT_Signal(signal,CP_B2_Pic.Width,CP_B2_Pic.Height,samplingRate);
+            using (Bitmap fftImage = DrawOscilloscope(signal, CP_B2_Pic.Width, CP_B2_Pic.Height, samplingRate)) {
+                CP_B2_Pic.Image?.Dispose(); // Dispose old image if replacing
+                CP_B2_Pic.Image = new Bitmap(fftImage); // Clone if needed
+            }
+        }
+
+        private void AB_Freq_CheckedChanged(object sender, EventArgs e) {
+            if (AB_Freq.Checked)
+                CP_B2_Pic.Image = DrawFFT_Signal(cp_sample_AB, CP_B2_Pic.Width, CP_B2_Pic.Height, 50000.0f, 0.0, 25000.0);
+        }
+
+        private void AB_Time_CheckedChanged(object sender, EventArgs e) {
+            if (AB_Time.Checked)
+                CP_B2_Pic.Image = DrawOscilloscope(cp_sample_AB, CP_B2_Pic.Width, CP_B2_Pic.Height, 50000.0f);
+
+        }
+
+        private void BC_Time_CheckedChanged(object sender, EventArgs e) {
+            if (BC_Time.Checked)
+                CP_C2_Pic.Image = DrawOscilloscope(cp_sample_BC, CP_C2_Pic.Width, CP_C2_Pic.Height, 50000.0f);
+        }
+
+        private void BC_Freq_CheckedChanged(object sender, EventArgs e) {
+            if (BC_Freq.Checked)
+                CP_C2_Pic.Image = DrawFFT_Signal(cp_sample_BC, CP_C2_Pic.Width, CP_C2_Pic.Height, 50000.0f, 0.0, 25000.0);
+        }
+
+        private void CD_Time_CheckedChanged(object sender, EventArgs e) {
+            if (CD_Time.Checked)
+                CP_D_Pic.Image = DrawOscilloscope(cp_sample_CD, CP_D_Pic.Width, CP_D_Pic.Height, 50000.0f);
+        }
+
+        private void CD_Freq_CheckedChanged(object sender, EventArgs e) {
+            if (CD_Freq.Checked)
+                CP_D_Pic.Image = DrawFFT_Signal(cp_sample_CD, CP_D_Pic.Width, CP_D_Pic.Height, 50000.0f, 0.0, 25000.0);
+        }
+
+        private void update_Freq_AB(string fAB) {
+            if (Freq_AB.InvokeRequired) {
+                Action action = delegate {
+                    Freq_AB.Text = fAB;
+                };
+                Freq_AB.Invoke(action);
+            } else {
+                Freq_AB.Text = fAB;
+            }
+        }
+        private void update_Duty_AB(string dAB) {
+            if (Duty_AB.InvokeRequired) {
+                Action action = delegate {
+                    Duty_AB.Text = dAB;
+                };
+                Duty_AB.Invoke(action);
+            } else {
+                Duty_AB.Text = dAB;
+            }
+        }
+        private void update_Vmax_AB(string vmax) {
+            if (Vmax_AB.InvokeRequired) {
+                Action action = delegate {
+                    Vmax_AB.Text = vmax;
+                };
+                Vmax_AB.Invoke(action);
+            } else {
+                Vmax_AB.Text = vmax;
+            }
+        }
+        private void update_Vmin_AB(string vmin) {
+            if (Vmin_AB.InvokeRequired) {
+                Action action = delegate {
+                    Vmin_AB.Text = vmin;
+                };
+                Vmin_AB.Invoke(action);
+            } else {
+                Vmin_AB.Text = vmin;
+            }
+        }
+        private void update_Freq_BC(string fAB) {
+            if (Freq_BC.InvokeRequired) {
+                Action action = delegate {
+                    Freq_BC.Text = fAB;
+                };
+                Freq_BC.Invoke(action);
+            } else {
+                Freq_BC.Text = fAB;
+            }
+        }
+        private void update_Duty_BC(string dAB) {
+            if (Duty_BC.InvokeRequired) {
+                Action action = delegate {
+                    Duty_BC.Text = dAB;
+                };
+                Duty_BC.Invoke(action);
+            } else {
+                Duty_BC.Text = dAB;
+            }
+        }
+        private void update_Vmax_BC(string vmax) {
+            if (Vmax_BC.InvokeRequired) {
+                Action action = delegate {
+                    Vmax_BC.Text = vmax;
+                };
+                Vmax_BC.Invoke(action);
+            } else {
+                Vmax_BC.Text = vmax;
+            }
+        }
+        private void update_Vmin_BC(string vmin) {
+            if (Vmin_BC.InvokeRequired) {
+                Action action = delegate {
+                    Vmin_BC.Text = vmin;
+                };
+                Vmin_BC.Invoke(action);
+            } else {
+                Vmin_BC.Text = vmin;
+            }
+        }
+        private void update_Freq_CD(string fAB) {
+            if (Freq_CD.InvokeRequired) {
+                Action action = delegate {
+                    Freq_CD.Text = fAB;
+                };
+                Freq_CD.Invoke(action);
+            } else {
+                Freq_CD.Text = fAB;
+            }
+        }
+        private void update_Duty_CD(string dAB) {
+            if (Duty_CD.InvokeRequired) {
+                Action action = delegate {
+                    Duty_CD.Text = dAB;
+                };
+                Duty_CD.Invoke(action);
+            } else {
+                Duty_CD.Text = dAB;
+            }
+        }
+        private void update_Vmax_CD(string vmax) {
+            if (Vmax_CD.InvokeRequired) {
+                Action action = delegate {
+                    Vmax_CD.Text = vmax;
+                };
+                Vmax_CD.Invoke(action);
+            } else {
+                Vmax_CD.Text = vmax;
+            }
+        }
+        private void update_Vmin_CD(string vmin) {
+            if (Vmin_CD.InvokeRequired) {
+                Action action = delegate {
+                    Vmin_CD.Text = vmin;
+                };
+                Vmin_CD.Invoke(action);
+            } else {
+                Vmin_CD.Text = vmin;
+            }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e) {
+            send_Bluetooth("AVR_reset\n"); 
         }
     }
 
-    public class Request_Testing_Result
-    {
-        public string? Package_req { get; set; }
-    }
 
-    public class State_Transition_Test
-    {
-        public string? State_To_Test { get; set; }
-        // public bool Testing_Result { get; set; }
-        public string? PWM_StartupDelay { get; set; }
-        public string? PWM_Amplitude { get; set; }
-        public string? PWM_NveAmplitude { get; set; }
-        public string? PWM_Freq { get; set; }
-        public string? PWM_DutyCycle { get; set; }
-        public string? PWM_Imax { get; set; }
-        public string? MainsOnDelay { get; set; }
-        public string? MainsOffDelay { get; set; }
-        public string? MainsFreq { get; set; }
-        public string? Voltage { get; set; }
-        public string? PP { get; set; }
-        public bool PWM_StartupDelay_Result { get; set; }
-        public bool PWM_Amplitude_Result { get; set; }
-        public bool PWM_NveAmplitude_Result { get; set; }
-        public bool PWM_Freq_Result { get; set; }
-        public bool PWM_DutyCycle_Result { get; set; }
-        public bool PWM_Imax_Result { get; set; }
-        public bool MainsOnDelay_Result { get; set; }
-        public bool MainsOffDelay_Result { get; set; }
-        public bool MainsFreq_Result { get; set; }
-        public bool Voltage_Result { get; set; }
-        public bool PP_Result { get; set; }
-    }
-
-    public class Diode_Test
-    {
-        public bool Diode_ShortCircuit_Result { get; set; }
-        public bool PE_OpenCircuit_Result { get; set; }
-        public bool Diode_OpenCircuit_Result { get; set; }
-        public string? Diode_ShortCircuit_MainsOffDelay { get; set; }
-        public string? PE_OpenCircuit_MainsOffDelay { get; set; }
-        public string? Diode_OpenCircuit_MainsOffDelay { get; set; }
-    }
-    public class RCD0
-    {
-        public bool RCD0_Result { get; set; }
-        public string? Trip_Time { get; set; }
-        public string? Limit { get; set; }
-        public string? Current { get; set; }
-    }
-
-    public class Insulation_Test
-    {
-        public bool Insulation_Testing { get; set; }
-        public string? L_PE { get; set; }
-        public string? N_PE { get; set; }
-        public string? Voltage { get; set; }
-    }
 
     enum ReportReceive_states
     {
