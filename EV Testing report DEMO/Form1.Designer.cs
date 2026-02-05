@@ -227,8 +227,6 @@
             Test_InsulatNeut = new Button();
             tabControl3 = new TabControl();
             testingGraphic = new TabPage();
-            Test_CP_Sample = new Label();
-            SamplingCP = new Button();
             RCD_TestingInjectedCurrent = new Label();
             RCD_Accecptable_TripTime = new Label();
             RCD_TripTime_ms_sts = new Label();
@@ -286,28 +284,32 @@
             B_PWM_Imax = new Label();
             B_PWM_Imax_sts = new Label();
             testControl = new GroupBox();
-            RCD_TestBTN = new Button();
-            Test_diode_open_Front = new Button();
-            Test_PE_open_Front = new Button();
-            Test_diode_Front = new Button();
+            button1 = new Button();
             ManualTest_Group = new GroupBox();
             selectState_A = new RadioButton();
             selectState_B = new RadioButton();
             ManualTestBTN = new Button();
             selectState_C = new RadioButton();
             selectState_D = new RadioButton();
+            Test_CP_Sample = new Label();
             label69 = new Label();
+            SamplingCP = new Button();
             AutoTest_Group = new GroupBox();
+            RCD_TestBTN = new Button();
             AutoScheme = new ComboBox();
+            Test_diode_open_Front = new Button();
             picScheme = new PictureBox();
+            Test_PE_open_Front = new Button();
             cancelBTN = new Button();
+            Test_diode_Front = new Button();
             Test_ALL_BTN = new Button();
             TestingMode = new ComboBox();
             ClrResult = new Button();
-            Bluetooth_Connect = new Button();
-            label68 = new Label();
-            ESP_Status = new Label();
             Bluetooth_Devices_List = new ComboBox();
+            ESP_Status = new Label();
+            label68 = new Label();
+            Bluetooth_Connect = new Button();
+            pictureBox1 = new PictureBox();
             TestControlTab = new TabPage();
             label70 = new Label();
             DocumentTab = new TabPage();
@@ -356,7 +358,6 @@
             CP_D_Pic = new PictureBox();
             Waveform_pic = new PictureBox();
             LoopTimer = new System.Windows.Forms.Timer(components);
-            button1 = new Button();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -368,6 +369,7 @@
             ManualTest_Group.SuspendLayout();
             AutoTest_Group.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picScheme).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             TestControlTab.SuspendLayout();
             DocumentTab.SuspendLayout();
             tabPage5.SuspendLayout();
@@ -1503,10 +1505,10 @@
             // SerialMoni
             // 
             SerialMoni.ImeMode = ImeMode.On;
-            SerialMoni.Location = new Point(8, 536);
+            SerialMoni.Location = new Point(536, 68);
             SerialMoni.Multiline = true;
             SerialMoni.Name = "SerialMoni";
-            SerialMoni.Size = new Size(479, 140);
+            SerialMoni.Size = new Size(228, 92);
             SerialMoni.TabIndex = 114;
             SerialMoni.TextChanged += SerialMoni_TextChanged;
             // 
@@ -2253,7 +2255,7 @@
             // 
             // TestBluetooth
             // 
-            TestBluetooth.Location = new Point(496, 560);
+            TestBluetooth.Location = new Point(580, 172);
             TestBluetooth.Name = "TestBluetooth";
             TestBluetooth.Size = new Size(104, 23);
             TestBluetooth.TabIndex = 137;
@@ -2265,7 +2267,7 @@
             // TestBluetoothTxt
             // 
             TestBluetoothTxt.AutoSize = true;
-            TestBluetoothTxt.Location = new Point(496, 584);
+            TestBluetoothTxt.Location = new Point(540, 196);
             TestBluetoothTxt.Name = "TestBluetoothTxt";
             TestBluetoothTxt.Size = new Size(44, 15);
             TestBluetoothTxt.TabIndex = 138;
@@ -2273,35 +2275,32 @@
             // 
             // INJ_readCP
             // 
-            INJ_readCP.Location = new Point(40, 344);
+            INJ_readCP.Location = new Point(672, 196);
             INJ_readCP.Name = "INJ_readCP";
             INJ_readCP.Size = new Size(75, 23);
             INJ_readCP.TabIndex = 139;
             INJ_readCP.Text = "R CP";
             INJ_readCP.UseVisualStyleBackColor = true;
-            INJ_readCP.Visible = false;
             INJ_readCP.Click += INJ_readCP_Click;
             // 
             // INJ_readPP
             // 
-            INJ_readPP.Location = new Point(40, 368);
+            INJ_readPP.Location = new Point(672, 220);
             INJ_readPP.Name = "INJ_readPP";
             INJ_readPP.Size = new Size(75, 23);
             INJ_readPP.TabIndex = 140;
             INJ_readPP.Text = "R PP";
             INJ_readPP.UseVisualStyleBackColor = true;
-            INJ_readPP.Visible = false;
             INJ_readPP.Click += INJ_readPP_Click;
             // 
             // INJ_readINS
             // 
-            INJ_readINS.Location = new Point(40, 392);
+            INJ_readINS.Location = new Point(672, 244);
             INJ_readINS.Name = "INJ_readINS";
             INJ_readINS.Size = new Size(75, 23);
             INJ_readINS.TabIndex = 141;
             INJ_readINS.Text = "R INS";
             INJ_readINS.UseVisualStyleBackColor = true;
-            INJ_readINS.Visible = false;
             INJ_readINS.Click += INJ_readINS_Click;
             // 
             // Test_PE_open
@@ -2343,19 +2342,13 @@
             tabControl3.Location = new Point(8, 8);
             tabControl3.Name = "tabControl3";
             tabControl3.SelectedIndex = 0;
-            tabControl3.Size = new Size(1640, 672);
+            tabControl3.Size = new Size(952, 480);
             tabControl3.TabIndex = 149;
             // 
             // testingGraphic
             // 
-            testingGraphic.BackgroundImage = (Image)resources.GetObject("testingGraphic.BackgroundImage");
-            testingGraphic.Controls.Add(button1);
-            testingGraphic.Controls.Add(Test_CP_Sample);
-            testingGraphic.Controls.Add(INJ_readINS);
-            testingGraphic.Controls.Add(SamplingCP);
-            testingGraphic.Controls.Add(INJ_readPP);
+            testingGraphic.AutoScroll = true;
             testingGraphic.Controls.Add(RCD_TestingInjectedCurrent);
-            testingGraphic.Controls.Add(INJ_readCP);
             testingGraphic.Controls.Add(RCD_Accecptable_TripTime);
             testingGraphic.Controls.Add(RCD_TripTime_ms_sts);
             testingGraphic.Controls.Add(RCD_TripTime_ms);
@@ -2412,42 +2405,19 @@
             testingGraphic.Controls.Add(B_PWM_Imax);
             testingGraphic.Controls.Add(B_PWM_Imax_sts);
             testingGraphic.Controls.Add(testControl);
-            testingGraphic.Controls.Add(Bluetooth_Connect);
-            testingGraphic.Controls.Add(label68);
-            testingGraphic.Controls.Add(ESP_Status);
-            testingGraphic.Controls.Add(Bluetooth_Devices_List);
+            testingGraphic.Controls.Add(pictureBox1);
             testingGraphic.Location = new Point(4, 24);
             testingGraphic.Name = "testingGraphic";
-            testingGraphic.Size = new Size(1632, 644);
+            testingGraphic.Size = new Size(944, 452);
             testingGraphic.TabIndex = 2;
             testingGraphic.Text = "Testing Control";
             testingGraphic.UseVisualStyleBackColor = true;
             testingGraphic.Click += testingGraphic_Click;
             // 
-            // Test_CP_Sample
-            // 
-            Test_CP_Sample.AutoSize = true;
-            Test_CP_Sample.Location = new Point(816, 568);
-            Test_CP_Sample.Name = "Test_CP_Sample";
-            Test_CP_Sample.Size = new Size(44, 15);
-            Test_CP_Sample.TabIndex = 181;
-            Test_CP_Sample.Text = "label71";
-            Test_CP_Sample.Visible = false;
-            // 
-            // SamplingCP
-            // 
-            SamplingCP.Location = new Point(864, 544);
-            SamplingCP.Name = "SamplingCP";
-            SamplingCP.Size = new Size(75, 23);
-            SamplingCP.TabIndex = 180;
-            SamplingCP.Text = "button1";
-            SamplingCP.UseVisualStyleBackColor = true;
-            SamplingCP.Click += SamplingCP_Click;
-            // 
             // RCD_TestingInjectedCurrent
             // 
             RCD_TestingInjectedCurrent.AutoSize = true;
-            RCD_TestingInjectedCurrent.Location = new Point(1264, 560);
+            RCD_TestingInjectedCurrent.Location = new Point(472, 1716);
             RCD_TestingInjectedCurrent.Margin = new Padding(2, 0, 2, 0);
             RCD_TestingInjectedCurrent.Name = "RCD_TestingInjectedCurrent";
             RCD_TestingInjectedCurrent.Size = new Size(12, 15);
@@ -2457,7 +2427,7 @@
             // RCD_Accecptable_TripTime
             // 
             RCD_Accecptable_TripTime.AutoSize = true;
-            RCD_Accecptable_TripTime.Location = new Point(1264, 545);
+            RCD_Accecptable_TripTime.Location = new Point(472, 1701);
             RCD_Accecptable_TripTime.Margin = new Padding(2, 0, 2, 0);
             RCD_Accecptable_TripTime.Name = "RCD_Accecptable_TripTime";
             RCD_Accecptable_TripTime.Size = new Size(12, 15);
@@ -2467,7 +2437,7 @@
             // RCD_TripTime_ms_sts
             // 
             RCD_TripTime_ms_sts.AutoSize = true;
-            RCD_TripTime_ms_sts.Location = new Point(1328, 530);
+            RCD_TripTime_ms_sts.Location = new Point(536, 1686);
             RCD_TripTime_ms_sts.Margin = new Padding(2, 0, 2, 0);
             RCD_TripTime_ms_sts.Name = "RCD_TripTime_ms_sts";
             RCD_TripTime_ms_sts.Size = new Size(12, 15);
@@ -2477,7 +2447,7 @@
             // RCD_TripTime_ms
             // 
             RCD_TripTime_ms.AutoSize = true;
-            RCD_TripTime_ms.Location = new Point(1264, 530);
+            RCD_TripTime_ms.Location = new Point(472, 1686);
             RCD_TripTime_ms.Margin = new Padding(2, 0, 2, 0);
             RCD_TripTime_ms.Name = "RCD_TripTime_ms";
             RCD_TripTime_ms.Size = new Size(12, 15);
@@ -2487,7 +2457,7 @@
             // DiodeOpen_MainOff
             // 
             DiodeOpen_MainOff.AutoSize = true;
-            DiodeOpen_MainOff.Location = new Point(1240, 408);
+            DiodeOpen_MainOff.Location = new Point(416, 1569);
             DiodeOpen_MainOff.Margin = new Padding(2, 0, 2, 0);
             DiodeOpen_MainOff.Name = "DiodeOpen_MainOff";
             DiodeOpen_MainOff.Size = new Size(12, 15);
@@ -2497,7 +2467,7 @@
             // DiodeOpen_MainOff_sts
             // 
             DiodeOpen_MainOff_sts.AutoSize = true;
-            DiodeOpen_MainOff_sts.Location = new Point(1304, 407);
+            DiodeOpen_MainOff_sts.Location = new Point(480, 1568);
             DiodeOpen_MainOff_sts.Margin = new Padding(2, 0, 2, 0);
             DiodeOpen_MainOff_sts.Name = "DiodeOpen_MainOff_sts";
             DiodeOpen_MainOff_sts.Size = new Size(12, 15);
@@ -2507,7 +2477,7 @@
             // PE_Open_MainOff
             // 
             PE_Open_MainOff.AutoSize = true;
-            PE_Open_MainOff.Location = new Point(1240, 264);
+            PE_Open_MainOff.Location = new Point(416, 1429);
             PE_Open_MainOff.Margin = new Padding(2, 0, 2, 0);
             PE_Open_MainOff.Name = "PE_Open_MainOff";
             PE_Open_MainOff.Size = new Size(12, 15);
@@ -2517,7 +2487,7 @@
             // PE_Open_MainOff_sts
             // 
             PE_Open_MainOff_sts.AutoSize = true;
-            PE_Open_MainOff_sts.Location = new Point(1304, 263);
+            PE_Open_MainOff_sts.Location = new Point(480, 1428);
             PE_Open_MainOff_sts.Margin = new Padding(2, 0, 2, 0);
             PE_Open_MainOff_sts.Name = "PE_Open_MainOff_sts";
             PE_Open_MainOff_sts.Size = new Size(12, 15);
@@ -2527,7 +2497,7 @@
             // DiodeSh_MainOff
             // 
             DiodeSh_MainOff.AutoSize = true;
-            DiodeSh_MainOff.Location = new Point(1240, 128);
+            DiodeSh_MainOff.Location = new Point(416, 1281);
             DiodeSh_MainOff.Margin = new Padding(2, 0, 2, 0);
             DiodeSh_MainOff.Name = "DiodeSh_MainOff";
             DiodeSh_MainOff.Size = new Size(12, 15);
@@ -2537,7 +2507,7 @@
             // DiodeSh_MainOff_sts
             // 
             DiodeSh_MainOff_sts.AutoSize = true;
-            DiodeSh_MainOff_sts.Location = new Point(1304, 127);
+            DiodeSh_MainOff_sts.Location = new Point(480, 1280);
             DiodeSh_MainOff_sts.Margin = new Padding(2, 0, 2, 0);
             DiodeSh_MainOff_sts.Name = "DiodeSh_MainOff_sts";
             DiodeSh_MainOff_sts.Size = new Size(12, 15);
@@ -2547,7 +2517,7 @@
             // CB_PWM_MainOff_sts
             // 
             CB_PWM_MainOff_sts.AutoSize = true;
-            CB_PWM_MainOff_sts.Location = new Point(1096, 472);
+            CB_PWM_MainOff_sts.Location = new Point(716, 1112);
             CB_PWM_MainOff_sts.Margin = new Padding(2, 0, 2, 0);
             CB_PWM_MainOff_sts.Name = "CB_PWM_MainOff_sts";
             CB_PWM_MainOff_sts.Size = new Size(12, 15);
@@ -2557,7 +2527,7 @@
             // CB_PWM_MainOff
             // 
             CB_PWM_MainOff.AutoSize = true;
-            CB_PWM_MainOff.Location = new Point(1032, 472);
+            CB_PWM_MainOff.Location = new Point(652, 1112);
             CB_PWM_MainOff.Margin = new Padding(2, 0, 2, 0);
             CB_PWM_MainOff.Name = "CB_PWM_MainOff";
             CB_PWM_MainOff.Size = new Size(12, 15);
@@ -2567,7 +2537,7 @@
             // D_PWM_PP_sts
             // 
             D_PWM_PP_sts.AutoSize = true;
-            D_PWM_PP_sts.Location = new Point(1096, 429);
+            D_PWM_PP_sts.Location = new Point(716, 1069);
             D_PWM_PP_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_PP_sts.Name = "D_PWM_PP_sts";
             D_PWM_PP_sts.Size = new Size(12, 15);
@@ -2577,7 +2547,7 @@
             // C_PWM_PP_sts
             // 
             C_PWM_PP_sts.AutoSize = true;
-            C_PWM_PP_sts.Location = new Point(1096, 282);
+            C_PWM_PP_sts.Location = new Point(408, 1203);
             C_PWM_PP_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_PP_sts.Name = "C_PWM_PP_sts";
             C_PWM_PP_sts.Size = new Size(12, 15);
@@ -2587,7 +2557,7 @@
             // D_PWM_PP
             // 
             D_PWM_PP.AutoSize = true;
-            D_PWM_PP.Location = new Point(1032, 429);
+            D_PWM_PP.Location = new Point(652, 1069);
             D_PWM_PP.Margin = new Padding(2, 0, 2, 0);
             D_PWM_PP.Name = "D_PWM_PP";
             D_PWM_PP.Size = new Size(12, 15);
@@ -2597,7 +2567,7 @@
             // C_PWM_PP
             // 
             C_PWM_PP.AutoSize = true;
-            C_PWM_PP.Location = new Point(1032, 282);
+            C_PWM_PP.Location = new Point(344, 1203);
             C_PWM_PP.Margin = new Padding(2, 0, 2, 0);
             C_PWM_PP.Name = "C_PWM_PP";
             C_PWM_PP.Size = new Size(12, 15);
@@ -2607,7 +2577,7 @@
             // D_PWM_MainFreq_sts
             // 
             D_PWM_MainFreq_sts.AutoSize = true;
-            D_PWM_MainFreq_sts.Location = new Point(1096, 414);
+            D_PWM_MainFreq_sts.Location = new Point(716, 1054);
             D_PWM_MainFreq_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_MainFreq_sts.Name = "D_PWM_MainFreq_sts";
             D_PWM_MainFreq_sts.Size = new Size(12, 15);
@@ -2617,7 +2587,7 @@
             // C_PWM_MainFreq_sts
             // 
             C_PWM_MainFreq_sts.AutoSize = true;
-            C_PWM_MainFreq_sts.Location = new Point(1096, 267);
+            C_PWM_MainFreq_sts.Location = new Point(408, 1188);
             C_PWM_MainFreq_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_MainFreq_sts.Name = "C_PWM_MainFreq_sts";
             C_PWM_MainFreq_sts.Size = new Size(12, 15);
@@ -2627,7 +2597,7 @@
             // D_PWM_MainFreq
             // 
             D_PWM_MainFreq.AutoSize = true;
-            D_PWM_MainFreq.Location = new Point(1032, 414);
+            D_PWM_MainFreq.Location = new Point(652, 1054);
             D_PWM_MainFreq.Margin = new Padding(2, 0, 2, 0);
             D_PWM_MainFreq.Name = "D_PWM_MainFreq";
             D_PWM_MainFreq.Size = new Size(12, 15);
@@ -2637,7 +2607,7 @@
             // C_PWM_MainFreq
             // 
             C_PWM_MainFreq.AutoSize = true;
-            C_PWM_MainFreq.Location = new Point(1032, 267);
+            C_PWM_MainFreq.Location = new Point(344, 1188);
             C_PWM_MainFreq.Margin = new Padding(2, 0, 2, 0);
             C_PWM_MainFreq.Name = "C_PWM_MainFreq";
             C_PWM_MainFreq.Size = new Size(12, 15);
@@ -2647,7 +2617,7 @@
             // D_PWM_MainVolt_sts
             // 
             D_PWM_MainVolt_sts.AutoSize = true;
-            D_PWM_MainVolt_sts.Location = new Point(1096, 399);
+            D_PWM_MainVolt_sts.Location = new Point(716, 1039);
             D_PWM_MainVolt_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_MainVolt_sts.Name = "D_PWM_MainVolt_sts";
             D_PWM_MainVolt_sts.Size = new Size(12, 15);
@@ -2657,7 +2627,7 @@
             // C_PWM_MainVolt_sts
             // 
             C_PWM_MainVolt_sts.AutoSize = true;
-            C_PWM_MainVolt_sts.Location = new Point(1096, 252);
+            C_PWM_MainVolt_sts.Location = new Point(408, 1173);
             C_PWM_MainVolt_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_MainVolt_sts.Name = "C_PWM_MainVolt_sts";
             C_PWM_MainVolt_sts.Size = new Size(12, 15);
@@ -2667,7 +2637,7 @@
             // D_PWM_MainVolt
             // 
             D_PWM_MainVolt.AutoSize = true;
-            D_PWM_MainVolt.Location = new Point(1032, 399);
+            D_PWM_MainVolt.Location = new Point(652, 1039);
             D_PWM_MainVolt.Margin = new Padding(2, 0, 2, 0);
             D_PWM_MainVolt.Name = "D_PWM_MainVolt";
             D_PWM_MainVolt.Size = new Size(12, 15);
@@ -2677,7 +2647,7 @@
             // C_PWM_MainVolt
             // 
             C_PWM_MainVolt.AutoSize = true;
-            C_PWM_MainVolt.Location = new Point(1032, 252);
+            C_PWM_MainVolt.Location = new Point(344, 1173);
             C_PWM_MainVolt.Margin = new Padding(2, 0, 2, 0);
             C_PWM_MainVolt.Name = "C_PWM_MainVolt";
             C_PWM_MainVolt.Size = new Size(12, 15);
@@ -2687,7 +2657,7 @@
             // D_PWM_Imax_sts
             // 
             D_PWM_Imax_sts.AutoSize = true;
-            D_PWM_Imax_sts.Location = new Point(1096, 384);
+            D_PWM_Imax_sts.Location = new Point(716, 1024);
             D_PWM_Imax_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Imax_sts.Name = "D_PWM_Imax_sts";
             D_PWM_Imax_sts.Size = new Size(12, 15);
@@ -2697,7 +2667,7 @@
             // C_PWM_Imax_sts
             // 
             C_PWM_Imax_sts.AutoSize = true;
-            C_PWM_Imax_sts.Location = new Point(1096, 237);
+            C_PWM_Imax_sts.Location = new Point(408, 1158);
             C_PWM_Imax_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Imax_sts.Name = "C_PWM_Imax_sts";
             C_PWM_Imax_sts.Size = new Size(12, 15);
@@ -2707,7 +2677,7 @@
             // D_PWM_Imax
             // 
             D_PWM_Imax.AutoSize = true;
-            D_PWM_Imax.Location = new Point(1032, 384);
+            D_PWM_Imax.Location = new Point(652, 1024);
             D_PWM_Imax.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Imax.Name = "D_PWM_Imax";
             D_PWM_Imax.Size = new Size(12, 15);
@@ -2717,7 +2687,7 @@
             // D_PWM_Duty_sts
             // 
             D_PWM_Duty_sts.AutoSize = true;
-            D_PWM_Duty_sts.Location = new Point(1096, 370);
+            D_PWM_Duty_sts.Location = new Point(716, 1010);
             D_PWM_Duty_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Duty_sts.Name = "D_PWM_Duty_sts";
             D_PWM_Duty_sts.Size = new Size(12, 15);
@@ -2727,7 +2697,7 @@
             // C_PWM_Imax
             // 
             C_PWM_Imax.AutoSize = true;
-            C_PWM_Imax.Location = new Point(1032, 237);
+            C_PWM_Imax.Location = new Point(344, 1158);
             C_PWM_Imax.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Imax.Name = "C_PWM_Imax";
             C_PWM_Imax.Size = new Size(12, 15);
@@ -2737,7 +2707,7 @@
             // D_PWM_Duty
             // 
             D_PWM_Duty.AutoSize = true;
-            D_PWM_Duty.Location = new Point(1032, 370);
+            D_PWM_Duty.Location = new Point(652, 1010);
             D_PWM_Duty.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Duty.Name = "D_PWM_Duty";
             D_PWM_Duty.Size = new Size(12, 15);
@@ -2747,7 +2717,7 @@
             // C_PWM_Duty_sts
             // 
             C_PWM_Duty_sts.AutoSize = true;
-            C_PWM_Duty_sts.Location = new Point(1096, 223);
+            C_PWM_Duty_sts.Location = new Point(408, 1144);
             C_PWM_Duty_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Duty_sts.Name = "C_PWM_Duty_sts";
             C_PWM_Duty_sts.Size = new Size(12, 15);
@@ -2757,7 +2727,7 @@
             // D_PWM_Freq_sts
             // 
             D_PWM_Freq_sts.AutoSize = true;
-            D_PWM_Freq_sts.Location = new Point(1096, 355);
+            D_PWM_Freq_sts.Location = new Point(716, 995);
             D_PWM_Freq_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Freq_sts.Name = "D_PWM_Freq_sts";
             D_PWM_Freq_sts.Size = new Size(12, 15);
@@ -2767,7 +2737,7 @@
             // C_PWM_Duty
             // 
             C_PWM_Duty.AutoSize = true;
-            C_PWM_Duty.Location = new Point(1032, 223);
+            C_PWM_Duty.Location = new Point(344, 1144);
             C_PWM_Duty.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Duty.Name = "C_PWM_Duty";
             C_PWM_Duty.Size = new Size(12, 15);
@@ -2777,7 +2747,7 @@
             // D_PWM_Freq
             // 
             D_PWM_Freq.AutoSize = true;
-            D_PWM_Freq.Location = new Point(1032, 355);
+            D_PWM_Freq.Location = new Point(652, 995);
             D_PWM_Freq.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Freq.Name = "D_PWM_Freq";
             D_PWM_Freq.Size = new Size(12, 15);
@@ -2787,7 +2757,7 @@
             // C_PWM_Freq_sts
             // 
             C_PWM_Freq_sts.AutoSize = true;
-            C_PWM_Freq_sts.Location = new Point(1096, 208);
+            C_PWM_Freq_sts.Location = new Point(408, 1129);
             C_PWM_Freq_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Freq_sts.Name = "C_PWM_Freq_sts";
             C_PWM_Freq_sts.Size = new Size(12, 15);
@@ -2797,7 +2767,7 @@
             // D_PWM_nPk_sts
             // 
             D_PWM_nPk_sts.AutoSize = true;
-            D_PWM_nPk_sts.Location = new Point(1096, 340);
+            D_PWM_nPk_sts.Location = new Point(716, 980);
             D_PWM_nPk_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_nPk_sts.Name = "D_PWM_nPk_sts";
             D_PWM_nPk_sts.Size = new Size(12, 15);
@@ -2807,7 +2777,7 @@
             // C_PWM_Freq
             // 
             C_PWM_Freq.AutoSize = true;
-            C_PWM_Freq.Location = new Point(1032, 208);
+            C_PWM_Freq.Location = new Point(344, 1129);
             C_PWM_Freq.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Freq.Name = "C_PWM_Freq";
             C_PWM_Freq.Size = new Size(12, 15);
@@ -2817,7 +2787,7 @@
             // D_PWM_Pk_sts
             // 
             D_PWM_Pk_sts.AutoSize = true;
-            D_PWM_Pk_sts.Location = new Point(1096, 325);
+            D_PWM_Pk_sts.Location = new Point(716, 965);
             D_PWM_Pk_sts.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Pk_sts.Name = "D_PWM_Pk_sts";
             D_PWM_Pk_sts.Size = new Size(12, 15);
@@ -2827,7 +2797,7 @@
             // C_PWM_nPk_sts
             // 
             C_PWM_nPk_sts.AutoSize = true;
-            C_PWM_nPk_sts.Location = new Point(1096, 193);
+            C_PWM_nPk_sts.Location = new Point(408, 1114);
             C_PWM_nPk_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_nPk_sts.Name = "C_PWM_nPk_sts";
             C_PWM_nPk_sts.Size = new Size(12, 15);
@@ -2837,7 +2807,7 @@
             // D_PWM_nPk
             // 
             D_PWM_nPk.AutoSize = true;
-            D_PWM_nPk.Location = new Point(1032, 340);
+            D_PWM_nPk.Location = new Point(652, 980);
             D_PWM_nPk.Margin = new Padding(2, 0, 2, 0);
             D_PWM_nPk.Name = "D_PWM_nPk";
             D_PWM_nPk.Size = new Size(12, 15);
@@ -2847,7 +2817,7 @@
             // C_PWM_Pk_sts
             // 
             C_PWM_Pk_sts.AutoSize = true;
-            C_PWM_Pk_sts.Location = new Point(1096, 178);
+            C_PWM_Pk_sts.Location = new Point(408, 1099);
             C_PWM_Pk_sts.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Pk_sts.Name = "C_PWM_Pk_sts";
             C_PWM_Pk_sts.Size = new Size(12, 15);
@@ -2857,7 +2827,7 @@
             // D_PWM_Pk
             // 
             D_PWM_Pk.AutoSize = true;
-            D_PWM_Pk.Location = new Point(1032, 325);
+            D_PWM_Pk.Location = new Point(652, 965);
             D_PWM_Pk.Margin = new Padding(2, 0, 2, 0);
             D_PWM_Pk.Name = "D_PWM_Pk";
             D_PWM_Pk.Size = new Size(12, 15);
@@ -2867,7 +2837,7 @@
             // C_PWM_nPk
             // 
             C_PWM_nPk.AutoSize = true;
-            C_PWM_nPk.Location = new Point(1032, 193);
+            C_PWM_nPk.Location = new Point(344, 1114);
             C_PWM_nPk.Margin = new Padding(2, 0, 2, 0);
             C_PWM_nPk.Name = "C_PWM_nPk";
             C_PWM_nPk.Size = new Size(12, 15);
@@ -2877,7 +2847,7 @@
             // C_PWM_Pk
             // 
             C_PWM_Pk.AutoSize = true;
-            C_PWM_Pk.Location = new Point(1032, 178);
+            C_PWM_Pk.Location = new Point(344, 1099);
             C_PWM_Pk.Margin = new Padding(2, 0, 2, 0);
             C_PWM_Pk.Name = "C_PWM_Pk";
             C_PWM_Pk.Size = new Size(12, 15);
@@ -2887,7 +2857,7 @@
             // BC_MainOn
             // 
             BC_MainOn.AutoSize = true;
-            BC_MainOn.Location = new Point(1032, 145);
+            BC_MainOn.Location = new Point(344, 1066);
             BC_MainOn.Margin = new Padding(2, 0, 2, 0);
             BC_MainOn.Name = "BC_MainOn";
             BC_MainOn.Size = new Size(12, 15);
@@ -2897,7 +2867,7 @@
             // BC_MainOn_sts
             // 
             BC_MainOn_sts.AutoSize = true;
-            BC_MainOn_sts.Location = new Point(1096, 144);
+            BC_MainOn_sts.Location = new Point(408, 1065);
             BC_MainOn_sts.Margin = new Padding(2, 0, 2, 0);
             BC_MainOn_sts.Name = "BC_MainOn_sts";
             BC_MainOn_sts.Size = new Size(12, 15);
@@ -2907,7 +2877,7 @@
             // B_PWM_Pk
             // 
             B_PWM_Pk.AutoSize = true;
-            B_PWM_Pk.Location = new Point(1032, 45);
+            B_PWM_Pk.Location = new Point(344, 966);
             B_PWM_Pk.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Pk.Name = "B_PWM_Pk";
             B_PWM_Pk.Size = new Size(12, 15);
@@ -2917,7 +2887,7 @@
             // B_PWM_Pk_sts
             // 
             B_PWM_Pk_sts.AutoSize = true;
-            B_PWM_Pk_sts.Location = new Point(1096, 44);
+            B_PWM_Pk_sts.Location = new Point(408, 965);
             B_PWM_Pk_sts.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Pk_sts.Name = "B_PWM_Pk_sts";
             B_PWM_Pk_sts.Size = new Size(12, 15);
@@ -2927,7 +2897,7 @@
             // B_PWM_nPk
             // 
             B_PWM_nPk.AutoSize = true;
-            B_PWM_nPk.Location = new Point(1032, 60);
+            B_PWM_nPk.Location = new Point(344, 981);
             B_PWM_nPk.Margin = new Padding(2, 0, 2, 0);
             B_PWM_nPk.Name = "B_PWM_nPk";
             B_PWM_nPk.Size = new Size(12, 15);
@@ -2937,7 +2907,7 @@
             // B_PWM_nPk_sts
             // 
             B_PWM_nPk_sts.AutoSize = true;
-            B_PWM_nPk_sts.Location = new Point(1096, 59);
+            B_PWM_nPk_sts.Location = new Point(408, 980);
             B_PWM_nPk_sts.Margin = new Padding(2, 0, 2, 0);
             B_PWM_nPk_sts.Name = "B_PWM_nPk_sts";
             B_PWM_nPk_sts.Size = new Size(12, 15);
@@ -2947,7 +2917,7 @@
             // B_PWM_Freq
             // 
             B_PWM_Freq.AutoSize = true;
-            B_PWM_Freq.Location = new Point(1032, 75);
+            B_PWM_Freq.Location = new Point(344, 996);
             B_PWM_Freq.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Freq.Name = "B_PWM_Freq";
             B_PWM_Freq.Size = new Size(12, 15);
@@ -2957,7 +2927,7 @@
             // B_PWM_Freq_sts
             // 
             B_PWM_Freq_sts.AutoSize = true;
-            B_PWM_Freq_sts.Location = new Point(1096, 74);
+            B_PWM_Freq_sts.Location = new Point(408, 995);
             B_PWM_Freq_sts.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Freq_sts.Name = "B_PWM_Freq_sts";
             B_PWM_Freq_sts.Size = new Size(12, 15);
@@ -2967,7 +2937,7 @@
             // B_PWM_Duty
             // 
             B_PWM_Duty.AutoSize = true;
-            B_PWM_Duty.Location = new Point(1032, 90);
+            B_PWM_Duty.Location = new Point(344, 1011);
             B_PWM_Duty.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Duty.Name = "B_PWM_Duty";
             B_PWM_Duty.Size = new Size(12, 15);
@@ -2977,7 +2947,7 @@
             // B_PWM_Duty_sts
             // 
             B_PWM_Duty_sts.AutoSize = true;
-            B_PWM_Duty_sts.Location = new Point(1096, 89);
+            B_PWM_Duty_sts.Location = new Point(408, 1010);
             B_PWM_Duty_sts.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Duty_sts.Name = "B_PWM_Duty_sts";
             B_PWM_Duty_sts.Size = new Size(12, 15);
@@ -2987,7 +2957,7 @@
             // B_PWM_Imax
             // 
             B_PWM_Imax.AutoSize = true;
-            B_PWM_Imax.Location = new Point(1032, 105);
+            B_PWM_Imax.Location = new Point(344, 1026);
             B_PWM_Imax.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Imax.Name = "B_PWM_Imax";
             B_PWM_Imax.Size = new Size(12, 15);
@@ -2997,7 +2967,7 @@
             // B_PWM_Imax_sts
             // 
             B_PWM_Imax_sts.AutoSize = true;
-            B_PWM_Imax_sts.Location = new Point(1096, 104);
+            B_PWM_Imax_sts.Location = new Point(408, 1025);
             B_PWM_Imax_sts.Margin = new Padding(2, 0, 2, 0);
             B_PWM_Imax_sts.Name = "B_PWM_Imax_sts";
             B_PWM_Imax_sts.Size = new Size(12, 15);
@@ -3006,61 +2976,40 @@
             // 
             // testControl
             // 
-            testControl.Controls.Add(RCD_TestBTN);
-            testControl.Controls.Add(Test_diode_open_Front);
-            testControl.Controls.Add(Test_PE_open_Front);
-            testControl.Controls.Add(Test_diode_Front);
+            testControl.Controls.Add(button1);
+            testControl.Controls.Add(TestBluetoothTxt);
             testControl.Controls.Add(ManualTest_Group);
+            testControl.Controls.Add(TestBluetooth);
+            testControl.Controls.Add(Test_CP_Sample);
+            testControl.Controls.Add(SerialMoni);
             testControl.Controls.Add(label69);
+            testControl.Controls.Add(INJ_readINS);
+            testControl.Controls.Add(SamplingCP);
             testControl.Controls.Add(AutoTest_Group);
+            testControl.Controls.Add(INJ_readPP);
             testControl.Controls.Add(TestingMode);
             testControl.Controls.Add(ClrResult);
-            testControl.Location = new Point(1328, 0);
+            testControl.Controls.Add(INJ_readCP);
+            testControl.Controls.Add(Bluetooth_Devices_List);
+            testControl.Controls.Add(ESP_Status);
+            testControl.Controls.Add(label68);
+            testControl.Controls.Add(Bluetooth_Connect);
+            testControl.Location = new Point(12, 12);
             testControl.Name = "testControl";
-            testControl.Size = new Size(296, 480);
+            testControl.Size = new Size(784, 320);
             testControl.TabIndex = 10;
             testControl.TabStop = false;
             testControl.Text = "Testing Control";
             // 
-            // RCD_TestBTN
+            // button1
             // 
-            RCD_TestBTN.Location = new Point(184, 184);
-            RCD_TestBTN.Name = "RCD_TestBTN";
-            RCD_TestBTN.Size = new Size(104, 32);
-            RCD_TestBTN.TabIndex = 154;
-            RCD_TestBTN.Text = "Test RCD";
-            RCD_TestBTN.UseVisualStyleBackColor = true;
-            RCD_TestBTN.Click += Test_RCD_Click;
-            // 
-            // Test_diode_open_Front
-            // 
-            Test_diode_open_Front.Location = new Point(184, 152);
-            Test_diode_open_Front.Name = "Test_diode_open_Front";
-            Test_diode_open_Front.Size = new Size(104, 32);
-            Test_diode_open_Front.TabIndex = 153;
-            Test_diode_open_Front.Text = "Test Diode Open";
-            Test_diode_open_Front.UseVisualStyleBackColor = true;
-            Test_diode_open_Front.Click += Test_diode_open_Click;
-            // 
-            // Test_PE_open_Front
-            // 
-            Test_PE_open_Front.Location = new Point(184, 120);
-            Test_PE_open_Front.Name = "Test_PE_open_Front";
-            Test_PE_open_Front.Size = new Size(104, 32);
-            Test_PE_open_Front.TabIndex = 152;
-            Test_PE_open_Front.Text = "Test PE Open";
-            Test_PE_open_Front.UseVisualStyleBackColor = true;
-            Test_PE_open_Front.Click += Test_PE_open_Click;
-            // 
-            // Test_diode_Front
-            // 
-            Test_diode_Front.Location = new Point(184, 88);
-            Test_diode_Front.Name = "Test_diode_Front";
-            Test_diode_Front.Size = new Size(104, 32);
-            Test_diode_Front.TabIndex = 151;
-            Test_diode_Front.Text = "Test Diode Short";
-            Test_diode_Front.UseVisualStyleBackColor = true;
-            Test_diode_Front.Click += button1_Click;
+            button1.Location = new Point(640, 272);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 182;
+            button1.Text = "button1";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
             // 
             // ManualTest_Group
             // 
@@ -3069,7 +3018,7 @@
             ManualTest_Group.Controls.Add(ManualTestBTN);
             ManualTest_Group.Controls.Add(selectState_C);
             ManualTest_Group.Controls.Add(selectState_D);
-            ManualTest_Group.Location = new Point(8, 352);
+            ManualTest_Group.Location = new Point(300, 84);
             ManualTest_Group.Name = "ManualTest_Group";
             ManualTest_Group.Size = new Size(176, 120);
             ManualTest_Group.TabIndex = 122;
@@ -3135,65 +3084,128 @@
             selectState_D.UseVisualStyleBackColor = true;
             selectState_D.Visible = false;
             // 
+            // Test_CP_Sample
+            // 
+            Test_CP_Sample.AutoSize = true;
+            Test_CP_Sample.Location = new Point(536, 252);
+            Test_CP_Sample.Name = "Test_CP_Sample";
+            Test_CP_Sample.Size = new Size(44, 15);
+            Test_CP_Sample.TabIndex = 181;
+            Test_CP_Sample.Text = "label71";
+            // 
             // label69
             // 
             label69.AutoSize = true;
-            label69.Location = new Point(16, 24);
+            label69.Location = new Point(16, 28);
             label69.Name = "label69";
             label69.Size = new Size(79, 15);
             label69.TabIndex = 150;
             label69.Text = "Testing Mode";
             // 
+            // SamplingCP
+            // 
+            SamplingCP.Location = new Point(584, 228);
+            SamplingCP.Name = "SamplingCP";
+            SamplingCP.Size = new Size(75, 23);
+            SamplingCP.TabIndex = 180;
+            SamplingCP.Text = "button1";
+            SamplingCP.UseVisualStyleBackColor = true;
+            SamplingCP.Click += SamplingCP_Click;
+            // 
             // AutoTest_Group
             // 
+            AutoTest_Group.Controls.Add(RCD_TestBTN);
             AutoTest_Group.Controls.Add(AutoScheme);
+            AutoTest_Group.Controls.Add(Test_diode_open_Front);
             AutoTest_Group.Controls.Add(picScheme);
+            AutoTest_Group.Controls.Add(Test_PE_open_Front);
             AutoTest_Group.Controls.Add(cancelBTN);
+            AutoTest_Group.Controls.Add(Test_diode_Front);
             AutoTest_Group.Controls.Add(Test_ALL_BTN);
-            AutoTest_Group.Location = new Point(8, 72);
+            AutoTest_Group.Location = new Point(4, 84);
             AutoTest_Group.Name = "AutoTest_Group";
-            AutoTest_Group.Size = new Size(176, 272);
+            AutoTest_Group.Size = new Size(292, 232);
             AutoTest_Group.TabIndex = 121;
             AutoTest_Group.TabStop = false;
             AutoTest_Group.Text = "Automatic Test";
             AutoTest_Group.Visible = false;
             // 
+            // RCD_TestBTN
+            // 
+            RCD_TestBTN.Location = new Point(8, 188);
+            RCD_TestBTN.Name = "RCD_TestBTN";
+            RCD_TestBTN.Size = new Size(104, 32);
+            RCD_TestBTN.TabIndex = 154;
+            RCD_TestBTN.Text = "Test RCD";
+            RCD_TestBTN.UseVisualStyleBackColor = true;
+            RCD_TestBTN.Click += Test_RCD_Click;
+            // 
             // AutoScheme
             // 
             AutoScheme.FormattingEnabled = true;
             AutoScheme.Items.AddRange(new object[] { "Scheme 1", "Scheme 2" });
-            AutoScheme.Location = new Point(8, 88);
+            AutoScheme.Location = new Point(120, 20);
             AutoScheme.Name = "AutoScheme";
             AutoScheme.Size = new Size(121, 23);
             AutoScheme.TabIndex = 124;
             AutoScheme.Text = "Scheme 1";
             AutoScheme.Visible = false;
             // 
+            // Test_diode_open_Front
+            // 
+            Test_diode_open_Front.Location = new Point(8, 124);
+            Test_diode_open_Front.Name = "Test_diode_open_Front";
+            Test_diode_open_Front.Size = new Size(104, 32);
+            Test_diode_open_Front.TabIndex = 153;
+            Test_diode_open_Front.Text = "Test Diode Open";
+            Test_diode_open_Front.UseVisualStyleBackColor = true;
+            Test_diode_open_Front.Click += Test_diode_open_Click;
+            // 
             // picScheme
             // 
             picScheme.Image = (Image)resources.GetObject("picScheme.Image");
-            picScheme.Location = new Point(8, 120);
+            picScheme.Location = new Point(116, 48);
             picScheme.Name = "picScheme";
             picScheme.Size = new Size(160, 144);
             picScheme.SizeMode = PictureBoxSizeMode.StretchImage;
             picScheme.TabIndex = 123;
             picScheme.TabStop = false;
             // 
+            // Test_PE_open_Front
+            // 
+            Test_PE_open_Front.Location = new Point(8, 156);
+            Test_PE_open_Front.Name = "Test_PE_open_Front";
+            Test_PE_open_Front.Size = new Size(104, 32);
+            Test_PE_open_Front.TabIndex = 152;
+            Test_PE_open_Front.Text = "Test PE Open";
+            Test_PE_open_Front.UseVisualStyleBackColor = true;
+            Test_PE_open_Front.Click += Test_PE_open_Click;
+            // 
             // cancelBTN
             // 
             cancelBTN.Location = new Point(8, 16);
             cancelBTN.Name = "cancelBTN";
-            cancelBTN.Size = new Size(88, 32);
+            cancelBTN.Size = new Size(100, 32);
             cancelBTN.TabIndex = 119;
             cancelBTN.Text = "Cancel Test";
             cancelBTN.UseVisualStyleBackColor = true;
             cancelBTN.Visible = false;
             // 
+            // Test_diode_Front
+            // 
+            Test_diode_Front.Location = new Point(8, 88);
+            Test_diode_Front.Name = "Test_diode_Front";
+            Test_diode_Front.Size = new Size(104, 32);
+            Test_diode_Front.TabIndex = 151;
+            Test_diode_Front.Text = "Test Diode Short";
+            Test_diode_Front.UseVisualStyleBackColor = true;
+            Test_diode_Front.Click += button1_Click;
+            // 
             // Test_ALL_BTN
             // 
-            Test_ALL_BTN.Location = new Point(8, 48);
+            Test_ALL_BTN.Location = new Point(8, 52);
             Test_ALL_BTN.Name = "Test_ALL_BTN";
-            Test_ALL_BTN.Size = new Size(88, 32);
+            Test_ALL_BTN.Size = new Size(100, 32);
             Test_ALL_BTN.TabIndex = 88;
             Test_ALL_BTN.Text = "PWM Test";
             Test_ALL_BTN.UseVisualStyleBackColor = true;
@@ -3221,48 +3233,58 @@
             ClrResult.UseVisualStyleBackColor = true;
             ClrResult.Click += ClrResult_Click;
             // 
-            // Bluetooth_Connect
+            // Bluetooth_Devices_List
             // 
-            Bluetooth_Connect.Enabled = false;
-            Bluetooth_Connect.Location = new Point(1552, 488);
-            Bluetooth_Connect.Name = "Bluetooth_Connect";
-            Bluetooth_Connect.Size = new Size(72, 24);
-            Bluetooth_Connect.TabIndex = 7;
-            Bluetooth_Connect.Text = "Connect";
-            Bluetooth_Connect.UseVisualStyleBackColor = true;
-            Bluetooth_Connect.Click += Bluetooth_Connect_Click;
-            // 
-            // label68
-            // 
-            label68.AutoSize = true;
-            label68.Location = new Point(1336, 496);
-            label68.Name = "label68";
-            label68.Size = new Size(42, 15);
-            label68.TabIndex = 6;
-            label68.Text = "Device";
+            Bluetooth_Devices_List.FormattingEnabled = true;
+            Bluetooth_Devices_List.Location = new Point(356, 44);
+            Bluetooth_Devices_List.Name = "Bluetooth_Devices_List";
+            Bluetooth_Devices_List.Size = new Size(128, 23);
+            Bluetooth_Devices_List.TabIndex = 5;
+            Bluetooth_Devices_List.DropDown += onDropdown;
+            Bluetooth_Devices_List.SelectedIndexChanged += onsel_Bluetooth;
             // 
             // ESP_Status
             // 
             ESP_Status.AutoSize = true;
-            ESP_Status.Location = new Point(1336, 512);
+            ESP_Status.Location = new Point(488, 20);
             ESP_Status.Margin = new Padding(2, 0, 2, 0);
             ESP_Status.Name = "ESP_Status";
             ESP_Status.Size = new Size(82, 15);
             ESP_Status.TabIndex = 8;
             ESP_Status.Text = "ESP32 Status : ";
             // 
-            // Bluetooth_Devices_List
+            // label68
             // 
-            Bluetooth_Devices_List.FormattingEnabled = true;
-            Bluetooth_Devices_List.Location = new Point(1384, 488);
-            Bluetooth_Devices_List.Name = "Bluetooth_Devices_List";
-            Bluetooth_Devices_List.Size = new Size(160, 23);
-            Bluetooth_Devices_List.TabIndex = 5;
-            Bluetooth_Devices_List.DropDown += onDropdown;
-            Bluetooth_Devices_List.SelectedIndexChanged += onsel_Bluetooth;
+            label68.AutoSize = true;
+            label68.Location = new Point(308, 48);
+            label68.Name = "label68";
+            label68.Size = new Size(42, 15);
+            label68.TabIndex = 6;
+            label68.Text = "Device";
+            // 
+            // Bluetooth_Connect
+            // 
+            Bluetooth_Connect.Enabled = false;
+            Bluetooth_Connect.Location = new Point(312, 16);
+            Bluetooth_Connect.Name = "Bluetooth_Connect";
+            Bluetooth_Connect.Size = new Size(172, 24);
+            Bluetooth_Connect.TabIndex = 7;
+            Bluetooth_Connect.Text = "Connect";
+            Bluetooth_Connect.UseVisualStyleBackColor = true;
+            Bluetooth_Connect.Click += Bluetooth_Connect_Click;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = Properties.Resources.Figure_App_Copy_of_Page_4_drawio;
+            pictureBox1.Location = new Point(12, 340);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(792, 1429);
+            pictureBox1.TabIndex = 183;
+            pictureBox1.TabStop = false;
             // 
             // TestControlTab
             // 
+            TestControlTab.AutoScroll = true;
             TestControlTab.Controls.Add(label70);
             TestControlTab.Controls.Add(Test_InsulatNeut);
             TestControlTab.Controls.Add(label5);
@@ -3413,7 +3435,7 @@
             TestControlTab.Location = new Point(4, 24);
             TestControlTab.Name = "TestControlTab";
             TestControlTab.Padding = new Padding(3);
-            TestControlTab.Size = new Size(1632, 644);
+            TestControlTab.Size = new Size(944, 452);
             TestControlTab.TabIndex = 0;
             TestControlTab.Text = "Testing Result";
             TestControlTab.UseVisualStyleBackColor = true;
@@ -3441,18 +3463,19 @@
             DocumentTab.Location = new Point(4, 24);
             DocumentTab.Name = "DocumentTab";
             DocumentTab.Padding = new Padding(3);
-            DocumentTab.Size = new Size(1632, 644);
+            DocumentTab.Size = new Size(944, 452);
             DocumentTab.TabIndex = 1;
             DocumentTab.Text = "Document";
             DocumentTab.UseVisualStyleBackColor = true;
             // 
             // tabPage5
             // 
+            tabPage5.AutoScroll = true;
             tabPage5.Controls.Add(tabControl4);
             tabPage5.Controls.Add(Waveform_pic);
             tabPage5.Location = new Point(4, 24);
             tabPage5.Name = "tabPage5";
-            tabPage5.Size = new Size(1632, 644);
+            tabPage5.Size = new Size(944, 452);
             tabPage5.TabIndex = 3;
             tabPage5.Text = "CP_Sample";
             tabPage5.UseVisualStyleBackColor = true;
@@ -3933,28 +3956,17 @@
             LoopTimer.Interval = 20;
             LoopTimer.Tick += LoopTimer_Tick;
             // 
-            // button1
-            // 
-            button1.Location = new Point(920, 588);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 182;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click_1;
-            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1664, 681);
+            ClientSize = new Size(965, 494);
             Controls.Add(tabControl3);
-            Controls.Add(TestBluetoothTxt);
-            Controls.Add(TestBluetooth);
-            Controls.Add(SerialMoni);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Margin = new Padding(2);
             Name = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "EVSE Tester";
             Load += Form1_Load;
             tabControl1.ResumeLayout(false);
@@ -3974,6 +3986,7 @@
             ManualTest_Group.PerformLayout();
             AutoTest_Group.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)picScheme).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             TestControlTab.ResumeLayout(false);
             TestControlTab.PerformLayout();
             DocumentTab.ResumeLayout(false);
@@ -3997,7 +4010,6 @@
             ((System.ComponentModel.ISupportInitialize)CP_D_Pic).EndInit();
             ((System.ComponentModel.ISupportInitialize)Waveform_pic).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -4329,5 +4341,6 @@
         private Label Duty_CD;
         private Label Freq_CD;
         private Button button1;
+        private PictureBox pictureBox1;
     }
 }

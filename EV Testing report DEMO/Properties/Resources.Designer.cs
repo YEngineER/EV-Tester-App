@@ -73,6 +73,16 @@ namespace EV_Testing_report_DEMO.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Figure_App_Copy_of_Page_4_drawio {
+            get {
+                object obj = ResourceManager.GetObject("Figure_App-Copy of Page-4.drawio", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap TestingScheme1 {
             get {
                 object obj = ResourceManager.GetObject("TestingScheme1", resourceCulture);
