@@ -767,6 +767,7 @@
             label35.Size = new Size(52, 15);
             label35.TabIndex = 42;
             label35.Text = "Voltage :";
+            label35.Visible = false;
             // 
             // label36
             // 
@@ -777,6 +778,7 @@
             label36.Size = new Size(88, 15);
             label36.TabIndex = 41;
             label36.Text = "N-PE [<7 MΩ] :";
+            label36.Visible = false;
             // 
             // label37
             // 
@@ -787,6 +789,7 @@
             label37.Size = new Size(85, 15);
             label37.TabIndex = 40;
             label37.Text = "L-PE [<7 MΩ] :";
+            label37.Visible = false;
             // 
             // label38
             // 
@@ -798,6 +801,7 @@
             label38.Size = new Size(149, 30);
             label38.TabIndex = 39;
             label38.Text = "Insulation Test";
+            label38.Visible = false;
             // 
             // AB_PWM_Startup
             // 
@@ -1041,6 +1045,7 @@
             Insulator_Volt.Size = new Size(12, 15);
             Insulator_Volt.TabIndex = 68;
             Insulator_Volt.Text = "-";
+            Insulator_Volt.Visible = false;
             // 
             // Insulator_Limit
             // 
@@ -1051,6 +1056,7 @@
             Insulator_Limit.Size = new Size(12, 15);
             Insulator_Limit.TabIndex = 67;
             Insulator_Limit.Text = "-";
+            Insulator_Limit.Visible = false;
             // 
             // Insulator_Result
             // 
@@ -1061,6 +1067,7 @@
             Insulator_Result.Size = new Size(12, 15);
             Insulator_Result.TabIndex = 66;
             Insulator_Result.Text = "-";
+            Insulator_Result.Visible = false;
             // 
             // DiodeShort_Delay
             // 
@@ -1143,6 +1150,7 @@
             Test_InsulatLine.TabIndex = 76;
             Test_InsulatLine.Text = "Test";
             Test_InsulatLine.UseVisualStyleBackColor = true;
+            Test_InsulatLine.Visible = false;
             Test_InsulatLine.Click += TestL_PE_Click;
             // 
             // Test_diode
@@ -1202,6 +1210,7 @@
             Insu_check.Size = new Size(20, 15);
             Insu_check.TabIndex = 82;
             Insu_check.Text = "(-)";
+            Insu_check.Visible = false;
             // 
             // Diode_Short_check
             // 
@@ -1510,6 +1519,7 @@
             SerialMoni.Name = "SerialMoni";
             SerialMoni.Size = new Size(228, 92);
             SerialMoni.TabIndex = 114;
+            SerialMoni.Visible = false;
             SerialMoni.TextChanged += SerialMoni_TextChanged;
             // 
             // label41
@@ -2272,6 +2282,7 @@
             TestBluetoothTxt.Size = new Size(44, 15);
             TestBluetoothTxt.TabIndex = 138;
             TestBluetoothTxt.Text = "label69";
+            TestBluetoothTxt.Visible = false;
             // 
             // INJ_readCP
             // 
@@ -2281,6 +2292,7 @@
             INJ_readCP.TabIndex = 139;
             INJ_readCP.Text = "R CP";
             INJ_readCP.UseVisualStyleBackColor = true;
+            INJ_readCP.Visible = false;
             INJ_readCP.Click += INJ_readCP_Click;
             // 
             // INJ_readPP
@@ -2291,6 +2303,7 @@
             INJ_readPP.TabIndex = 140;
             INJ_readPP.Text = "R PP";
             INJ_readPP.UseVisualStyleBackColor = true;
+            INJ_readPP.Visible = false;
             INJ_readPP.Click += INJ_readPP_Click;
             // 
             // INJ_readINS
@@ -2301,6 +2314,7 @@
             INJ_readINS.TabIndex = 141;
             INJ_readINS.Text = "R INS";
             INJ_readINS.UseVisualStyleBackColor = true;
+            INJ_readINS.Visible = false;
             INJ_readINS.Click += INJ_readINS_Click;
             // 
             // Test_PE_open
@@ -2331,6 +2345,7 @@
             Test_InsulatNeut.TabIndex = 76;
             Test_InsulatNeut.Text = "Test";
             Test_InsulatNeut.UseVisualStyleBackColor = true;
+            Test_InsulatNeut.Visible = false;
             Test_InsulatNeut.Click += TestN_PE_Click;
             // 
             // tabControl3
@@ -3009,6 +3024,7 @@
             button1.TabIndex = 182;
             button1.Text = "button1";
             button1.UseVisualStyleBackColor = true;
+            button1.Visible = false;
             button1.Click += button1_Click_1;
             // 
             // ManualTest_Group
@@ -3037,6 +3053,7 @@
             selectState_A.Text = "State A";
             selectState_A.UseVisualStyleBackColor = true;
             selectState_A.Visible = false;
+            selectState_A.Click += selectState_A_Click;
             // 
             // selectState_B
             // 
@@ -3049,6 +3066,7 @@
             selectState_B.Text = "State B";
             selectState_B.UseVisualStyleBackColor = true;
             selectState_B.Visible = false;
+            selectState_B.Click += selectState_B_Click;
             // 
             // ManualTestBTN
             // 
@@ -3059,6 +3077,7 @@
             ManualTestBTN.Text = "Test State";
             ManualTestBTN.UseVisualStyleBackColor = true;
             ManualTestBTN.Visible = false;
+            ManualTestBTN.Click += ManualTestBTN_Click_1;
             // 
             // selectState_C
             // 
@@ -3071,6 +3090,7 @@
             selectState_C.Text = "State C";
             selectState_C.UseVisualStyleBackColor = true;
             selectState_C.Visible = false;
+            selectState_C.Click += selectState_C_Click;
             // 
             // selectState_D
             // 
@@ -3083,6 +3103,7 @@
             selectState_D.Text = "State D";
             selectState_D.UseVisualStyleBackColor = true;
             selectState_D.Visible = false;
+            selectState_D.Click += selectState_D_Click;
             // 
             // Test_CP_Sample
             // 
@@ -3092,6 +3113,7 @@
             Test_CP_Sample.Size = new Size(44, 15);
             Test_CP_Sample.TabIndex = 181;
             Test_CP_Sample.Text = "label71";
+            Test_CP_Sample.Visible = false;
             // 
             // label69
             // 
@@ -3110,6 +3132,7 @@
             SamplingCP.TabIndex = 180;
             SamplingCP.Text = "button1";
             SamplingCP.UseVisualStyleBackColor = true;
+            SamplingCP.Visible = false;
             SamplingCP.Click += SamplingCP_Click;
             // 
             // AutoTest_Group

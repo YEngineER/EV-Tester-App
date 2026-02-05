@@ -623,11 +623,16 @@ namespace EV_Testing_report_DEMO
                 CB_PWM_Startup.Text = result_State_C_to_B.PWM_StartupDelay + " ms";
             }
 
+            
+
             CB_PWM_Amp.Text = result_State_C_to_B.PWM_Amplitude + " V";
-            CB_PWM_NVE.Text = result_State_C_to_B.PWM_NveAmplitude + " V";
-            CB_PWM_Freq.Text = result_State_C_to_B.PWM_Freq + " Hz";
-            CB_PWM_Duty.Text = result_State_C_to_B.PWM_DutyCycle + " %";
-            CB_PWM_Imax.Text = result_State_C_to_B.PWM_Imax + " A";
+
+                CB_PWM_NVE.Text = result_State_C_to_B.PWM_NveAmplitude + " V";
+                CB_PWM_Freq.Text = result_State_C_to_B.PWM_Freq + " Hz";
+                CB_PWM_Duty.Text = result_State_C_to_B.PWM_DutyCycle + " %";
+                CB_PWM_Imax.Text = result_State_C_to_B.PWM_Imax + " A";
+            
+
             CB_PWM_OffDel.Text = result_State_C_to_B.MainsOffDelay + " ms";
 
             if (result_State_C_to_B.PWM_StartupDelay_Result) {
@@ -644,34 +649,37 @@ namespace EV_Testing_report_DEMO
                 CB_PWM_Amp_Result.Text = "Fail";
                 CB_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_C_to_B.PWM_NveAmplitude_Result) {
-                CB_PWM_NVE_Result.Text = "Pass";
-                CB_PWM_NVE_Result.ForeColor = Color.Green;
-            } else {
-                CB_PWM_NVE_Result.Text = "Fail";
-                CB_PWM_NVE_Result.ForeColor = Color.Red;
-            }
-            if (result_State_C_to_B.PWM_Freq_Result) {
-                CB_PWM_Freq_Result.Text = "Pass";
-                CB_PWM_Freq_Result.ForeColor = Color.Green;
-            } else {
-                CB_PWM_Freq_Result.Text = "Fail";
-                CB_PWM_Freq_Result.ForeColor = Color.Red;
-            }
-            if (result_State_C_to_B.PWM_DutyCycle_Result) {
-                CB_PWM_Duty_Result.Text = "Pass";
-                CB_PWM_Duty_Result.ForeColor = Color.Green;
-            } else {
-                CB_PWM_Duty_Result.Text = "Fail";
-                CB_PWM_Duty_Result.ForeColor = Color.Red;
-            }
-            if (result_State_C_to_B.PWM_Imax_Result) {
-                CB_PWM_Imax_Result.Text = "Pass";
-                CB_PWM_Imax_Result.ForeColor = Color.Green;
-            } else {
-                CB_PWM_Imax_Result.Text = "Fail";
-                CB_PWM_Imax_Result.ForeColor = Color.Red;
-            }
+
+                if (result_State_C_to_B.PWM_NveAmplitude_Result) {
+                    CB_PWM_NVE_Result.Text = "Pass";
+                    CB_PWM_NVE_Result.ForeColor = Color.Green;
+                } else {
+                    CB_PWM_NVE_Result.Text = "Fail";
+                    CB_PWM_NVE_Result.ForeColor = Color.Red;
+                }
+                if (result_State_C_to_B.PWM_Freq_Result) {
+                    CB_PWM_Freq_Result.Text = "Pass";
+                    CB_PWM_Freq_Result.ForeColor = Color.Green;
+                } else {
+                    CB_PWM_Freq_Result.Text = "Fail";
+                    CB_PWM_Freq_Result.ForeColor = Color.Red;
+                }
+                if (result_State_C_to_B.PWM_DutyCycle_Result) {
+                    CB_PWM_Duty_Result.Text = "Pass";
+                    CB_PWM_Duty_Result.ForeColor = Color.Green;
+                } else {
+                    CB_PWM_Duty_Result.Text = "Fail";
+                    CB_PWM_Duty_Result.ForeColor = Color.Red;
+                }
+                if (result_State_C_to_B.PWM_Imax_Result) {
+                    CB_PWM_Imax_Result.Text = "Pass";
+                    CB_PWM_Imax_Result.ForeColor = Color.Green;
+                } else {
+                    CB_PWM_Imax_Result.Text = "Fail";
+                    CB_PWM_Imax_Result.ForeColor = Color.Red;
+                }
+            
+
             if (result_State_C_to_B.MainsOffDelay_Result) {
                 CB_PWM_OffDel_Result.Text = "Pass";
                 CB_PWM_OffDel_Result.ForeColor = Color.Green;
@@ -716,11 +724,29 @@ namespace EV_Testing_report_DEMO
                 BD_PWM_Startup.Text = result_State_B_to_D.PWM_StartupDelay + " ms";
             }
 
+            Boolean CP_isDC = false;
+
+            float duty_pwm;
+            float.TryParse(s_B_D.PWM_DutyCycle, out duty_pwm);
+            if (duty_pwm < 97.0f) {
+                CP_isDC = true;
+            }
+
             BD_PWM_Amp.Text = result_State_B_to_D.PWM_Amplitude + " V";
-            BD_PWM_NVE.Text = result_State_B_to_D.PWM_NveAmplitude + " V";
-            BD_PWM_Freq.Text = result_State_B_to_D.PWM_Freq + " Hz";
-            BD_PWM_Duty.Text = result_State_B_to_D.PWM_DutyCycle + " %";
-            BD_PWM_Imax.Text = result_State_B_to_D.PWM_Imax + " A";
+
+            if (!CP_isDC) {
+                BD_PWM_NVE.Text = "-";
+                BD_PWM_Freq.Text = "-";
+                BD_PWM_Duty.Text = "-";
+                BD_PWM_Imax.Text = "-";
+
+            } else {
+                BD_PWM_NVE.Text = result_State_B_to_D.PWM_NveAmplitude + " V";
+                BD_PWM_Freq.Text = result_State_B_to_D.PWM_Freq + " Hz";
+                BD_PWM_Duty.Text = result_State_B_to_D.PWM_DutyCycle + " %";
+                BD_PWM_Imax.Text = result_State_B_to_D.PWM_Imax + " A";
+            }
+
             BD_Voltage.Text = result_State_B_to_D.Voltage + " V";
             /*if (result_State_B_to_D.Testing_Result)
             {
@@ -750,34 +776,50 @@ namespace EV_Testing_report_DEMO
                 BD_PWM_Amp_Result.Text = "Fail";
                 BD_PWM_Amp_Result.ForeColor = Color.Red;
             }
-            if (result_State_B_to_D.PWM_NveAmplitude_Result) {
-                BD_PWM_NVE_Result.Text = "Pass";
-                BD_PWM_NVE_Result.ForeColor = Color.Green;
+
+            if (!CP_isDC) {
+                BD_PWM_NVE_Result.Text = "-";
+                BD_PWM_Freq_Result.Text = "-";
+                BD_PWM_Duty_Result.Text = "-";
+                BD_PWM_Imax_Result.Text = "-";
+
+                BD_PWM_NVE_Result.ForeColor = Color.Black;
+                BD_PWM_Freq_Result.ForeColor = Color.Black;
+                BD_PWM_Duty_Result.ForeColor = Color.Black;
+                BD_PWM_Imax_Result.ForeColor = Color.Black;
             } else {
-                BD_PWM_NVE_Result.Text = "Fail";
-                BD_PWM_NVE_Result.ForeColor = Color.Red;
+                if (result_State_B_to_D.PWM_NveAmplitude_Result) {
+                    BD_PWM_NVE_Result.Text = "Pass";
+                    BD_PWM_NVE_Result.ForeColor = Color.Green;
+                } else {
+                    BD_PWM_NVE_Result.Text = "Fail";
+                    BD_PWM_NVE_Result.ForeColor = Color.Red;
+                }
+                if (result_State_B_to_D.PWM_Freq_Result) {
+                    BD_PWM_Freq_Result.Text = "Pass";
+                    BD_PWM_Freq_Result.ForeColor = Color.Green;
+                } else {
+                    BD_PWM_Freq_Result.Text = "Fail";
+                    BD_PWM_Freq_Result.ForeColor = Color.Red;
+                }
+                if (result_State_B_to_D.PWM_DutyCycle_Result) {
+                    BD_PWM_Duty_Result.Text = "Pass";
+                    BD_PWM_Duty_Result.ForeColor = Color.Green;
+                } else {
+                    BD_PWM_Duty_Result.Text = "Fail";
+                    BD_PWM_Duty_Result.ForeColor = Color.Red;
+                }
+                if (result_State_B_to_D.PWM_Imax_Result) {
+                    BD_PWM_Imax_Result.Text = "Pass";
+                    BD_PWM_Imax_Result.ForeColor = Color.Green;
+                } else {
+                    BD_PWM_Imax_Result.Text = "Fail";
+                    BD_PWM_Imax_Result.ForeColor = Color.Red;
+                }
             }
-            if (result_State_B_to_D.PWM_Freq_Result) {
-                BD_PWM_Freq_Result.Text = "Pass";
-                BD_PWM_Freq_Result.ForeColor = Color.Green;
-            } else {
-                BD_PWM_Freq_Result.Text = "Fail";
-                BD_PWM_Freq_Result.ForeColor = Color.Red;
-            }
-            if (result_State_B_to_D.PWM_DutyCycle_Result) {
-                BD_PWM_Duty_Result.Text = "Pass";
-                BD_PWM_Duty_Result.ForeColor = Color.Green;
-            } else {
-                BD_PWM_Duty_Result.Text = "Fail";
-                BD_PWM_Duty_Result.ForeColor = Color.Red;
-            }
-            if (result_State_B_to_D.PWM_Imax_Result) {
-                BD_PWM_Imax_Result.Text = "Pass";
-                BD_PWM_Imax_Result.ForeColor = Color.Green;
-            } else {
-                BD_PWM_Imax_Result.Text = "Fail";
-                BD_PWM_Imax_Result.ForeColor = Color.Red;
-            }
+            
+
+
             if (result_State_B_to_D.Voltage_Result) {
                 BD_Voltage_Result.Text = "Pass";
                 BD_Voltage_Result.ForeColor = Color.Green;
@@ -811,10 +853,12 @@ namespace EV_Testing_report_DEMO
 
 
             D_PWM_Pk.Text = BD_PWM_Amp.Text;
+
             D_PWM_nPk.Text = BD_PWM_NVE.Text;
             D_PWM_Freq.Text = BD_PWM_Freq.Text;
             D_PWM_Duty.Text = BD_PWM_Duty.Text;
             D_PWM_Imax.Text = BD_PWM_Imax.Text;
+
             D_PWM_MainVolt.Text = BD_Voltage.Text;
             D_PWM_MainFreq.Text = BD_PWM_MainFreq.Text;
             D_PWM_PP.Text = BD_PP.Text;
@@ -1770,6 +1814,7 @@ namespace EV_Testing_report_DEMO
                 client.Close();
                 bluetoothStream.Close();
 
+                TestingMode.Visible = false;
 
                 client = new BluetoothClient();
                 bluetoothStream = null;
@@ -1948,7 +1993,7 @@ namespace EV_Testing_report_DEMO
 
         private void TestingMode_SelectedIndexChanged(object sender, EventArgs e) {
             if (TestingMode.Text == "Manual") {
-                ManualTestBTN.Visible = true;
+                ManualTestBTN.Visible = false;
                 selectState_A.Visible = true;
                 selectState_B.Visible = true;
                 selectState_C.Visible = true;
@@ -2459,7 +2504,11 @@ namespace EV_Testing_report_DEMO
         }
 
         private void button1_Click_1(object sender, EventArgs e) {
-            send_Bluetooth("AVR_reset\n"); 
+            send_Bluetooth("AVR_reset\n");
+        }
+
+        private void ManualTestBTN_Click_1(object sender, EventArgs e) {
+
         }
     }
 
