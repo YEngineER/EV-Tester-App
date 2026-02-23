@@ -284,6 +284,12 @@
             B_PWM_Imax = new Label();
             B_PWM_Imax_sts = new Label();
             testControl = new GroupBox();
+            testJsonCheck = new Label();
+            button5 = new Button();
+            button4 = new Button();
+            button3 = new Button();
+            button6 = new Button();
+            button2 = new Button();
             button1 = new Button();
             ManualTest_Group = new GroupBox();
             selectState_A = new RadioButton();
@@ -295,6 +301,8 @@
             label69 = new Label();
             SamplingCP = new Button();
             AutoTest_Group = new GroupBox();
+            TESTProcessLBL = new Label();
+            TESTProcessBar = new ProgressBar();
             RCD_TestBTN = new Button();
             AutoScheme = new ComboBox();
             Test_diode_open_Front = new Button();
@@ -313,6 +321,7 @@
             TestControlTab = new TabPage();
             label70 = new Label();
             DocumentTab = new TabPage();
+            testExpBTN = new Button();
             tabPage5 = new TabPage();
             tabControl4 = new TabControl();
             tabPage6 = new TabPage();
@@ -2991,6 +3000,12 @@
             // 
             // testControl
             // 
+            testControl.Controls.Add(testJsonCheck);
+            testControl.Controls.Add(button5);
+            testControl.Controls.Add(button4);
+            testControl.Controls.Add(button3);
+            testControl.Controls.Add(button6);
+            testControl.Controls.Add(button2);
             testControl.Controls.Add(button1);
             testControl.Controls.Add(TestBluetoothTxt);
             testControl.Controls.Add(ManualTest_Group);
@@ -3015,6 +3030,71 @@
             testControl.TabIndex = 10;
             testControl.TabStop = false;
             testControl.Text = "Testing Control";
+            // 
+            // testJsonCheck
+            // 
+            testJsonCheck.AutoSize = true;
+            testJsonCheck.Location = new Point(440, 260);
+            testJsonCheck.Name = "testJsonCheck";
+            testJsonCheck.Size = new Size(44, 15);
+            testJsonCheck.TabIndex = 184;
+            testJsonCheck.Text = "label83";
+            testJsonCheck.Visible = false;
+            // 
+            // button5
+            // 
+            button5.Location = new Point(344, 284);
+            button5.Name = "button5";
+            button5.Size = new Size(80, 23);
+            button5.TabIndex = 183;
+            button5.Text = "JSON RCD";
+            button5.UseVisualStyleBackColor = true;
+            button5.Visible = false;
+            button5.Click += button5_Click;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(344, 260);
+            button4.Name = "button4";
+            button4.Size = new Size(80, 23);
+            button4.TabIndex = 183;
+            button4.Text = "JSON Ins";
+            button4.UseVisualStyleBackColor = true;
+            button4.Visible = false;
+            button4.Click += button4_Click;
+            // 
+            // button3
+            // 
+            button3.Location = new Point(344, 236);
+            button3.Name = "button3";
+            button3.Size = new Size(80, 23);
+            button3.TabIndex = 183;
+            button3.Text = "JSON Diode";
+            button3.UseVisualStyleBackColor = true;
+            button3.Visible = false;
+            button3.Click += button3_Click;
+            // 
+            // button6
+            // 
+            button6.Location = new Point(428, 212);
+            button6.Name = "button6";
+            button6.Size = new Size(80, 23);
+            button6.TabIndex = 183;
+            button6.Text = "JSON array";
+            button6.UseVisualStyleBackColor = true;
+            button6.Visible = false;
+            button6.Click += button6_Click;
+            // 
+            // button2
+            // 
+            button2.Location = new Point(344, 212);
+            button2.Name = "button2";
+            button2.Size = new Size(80, 23);
+            button2.TabIndex = 183;
+            button2.Text = "JSON CP";
+            button2.UseVisualStyleBackColor = true;
+            button2.Visible = false;
+            button2.Click += button2_Click;
             // 
             // button1
             // 
@@ -3137,6 +3217,8 @@
             // 
             // AutoTest_Group
             // 
+            AutoTest_Group.Controls.Add(TESTProcessLBL);
+            AutoTest_Group.Controls.Add(TESTProcessBar);
             AutoTest_Group.Controls.Add(RCD_TestBTN);
             AutoTest_Group.Controls.Add(AutoScheme);
             AutoTest_Group.Controls.Add(Test_diode_open_Front);
@@ -3153,6 +3235,22 @@
             AutoTest_Group.Text = "Automatic Test";
             AutoTest_Group.Visible = false;
             // 
+            // TESTProcessLBL
+            // 
+            TESTProcessLBL.AutoSize = true;
+            TESTProcessLBL.Location = new Point(116, 24);
+            TESTProcessLBL.Name = "TESTProcessLBL";
+            TESTProcessLBL.Size = new Size(44, 15);
+            TESTProcessLBL.TabIndex = 156;
+            TESTProcessLBL.Text = "label83";
+            // 
+            // TESTProcessBar
+            // 
+            TESTProcessBar.Location = new Point(116, 44);
+            TESTProcessBar.Name = "TESTProcessBar";
+            TESTProcessBar.Size = new Size(168, 23);
+            TESTProcessBar.TabIndex = 155;
+            // 
             // RCD_TestBTN
             // 
             RCD_TestBTN.Location = new Point(8, 188);
@@ -3167,7 +3265,7 @@
             // 
             AutoScheme.FormattingEnabled = true;
             AutoScheme.Items.AddRange(new object[] { "Scheme 1", "Scheme 2" });
-            AutoScheme.Location = new Point(120, 20);
+            AutoScheme.Location = new Point(116, 72);
             AutoScheme.Name = "AutoScheme";
             AutoScheme.Size = new Size(121, 23);
             AutoScheme.TabIndex = 124;
@@ -3187,9 +3285,9 @@
             // picScheme
             // 
             picScheme.Image = (Image)resources.GetObject("picScheme.Image");
-            picScheme.Location = new Point(116, 48);
+            picScheme.Location = new Point(116, 100);
             picScheme.Name = "picScheme";
-            picScheme.Size = new Size(160, 144);
+            picScheme.Size = new Size(132, 116);
             picScheme.SizeMode = PictureBoxSizeMode.StretchImage;
             picScheme.TabIndex = 123;
             picScheme.TabStop = false;
@@ -3213,6 +3311,7 @@
             cancelBTN.Text = "Cancel Test";
             cancelBTN.UseVisualStyleBackColor = true;
             cancelBTN.Visible = false;
+            cancelBTN.Click += cancelBTN_Click_1;
             // 
             // Test_diode_Front
             // 
@@ -3302,6 +3401,7 @@
             pictureBox1.Location = new Point(12, 340);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(792, 1429);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 183;
             pictureBox1.TabStop = false;
             // 
@@ -3475,6 +3575,7 @@
             // 
             // DocumentTab
             // 
+            DocumentTab.Controls.Add(testExpBTN);
             DocumentTab.Controls.Add(tabControl1);
             DocumentTab.Controls.Add(ExportDOCX);
             DocumentTab.Controls.Add(SelTelp);
@@ -3490,6 +3591,17 @@
             DocumentTab.TabIndex = 1;
             DocumentTab.Text = "Document";
             DocumentTab.UseVisualStyleBackColor = true;
+            // 
+            // testExpBTN
+            // 
+            testExpBTN.Location = new Point(176, 392);
+            testExpBTN.Name = "testExpBTN";
+            testExpBTN.Size = new Size(75, 23);
+            testExpBTN.TabIndex = 136;
+            testExpBTN.Text = "TestExp";
+            testExpBTN.UseVisualStyleBackColor = true;
+            testExpBTN.Visible = false;
+            testExpBTN.Click += testExpBTN_Click;
             // 
             // tabPage5
             // 
@@ -4008,6 +4120,7 @@
             ManualTest_Group.ResumeLayout(false);
             ManualTest_Group.PerformLayout();
             AutoTest_Group.ResumeLayout(false);
+            AutoTest_Group.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)picScheme).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             TestControlTab.ResumeLayout(false);
@@ -4365,5 +4478,14 @@
         private Label Freq_CD;
         private Button button1;
         private PictureBox pictureBox1;
+        private Button button3;
+        private Button button2;
+        private Button button4;
+        private Button button5;
+        private Button button6;
+        private Label testJsonCheck;
+        private Label TESTProcessLBL;
+        private ProgressBar TESTProcessBar;
+        private Button testExpBTN;
     }
 }

@@ -20,6 +20,9 @@ using System.Text;
 using System.Numerics;
 using System.Linq;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using Newtonsoft.Json.Linq;
+using System.Reflection.Metadata;
+
 
 namespace EV_Testing_report_DEMO
 {
@@ -38,6 +41,10 @@ namespace EV_Testing_report_DEMO
         Insulation_Test? Insulation_Test = new Insulation_Test { };
 
         int num = 0;
+
+        string JsonOUTPUT = "";
+        string JsonMEM = "";
+        int jsonObjLayer = 0;
 
         bool[] testing_Check = { false, false, false, false, false, false, false };
         bool scan_read = false;
@@ -60,6 +67,8 @@ namespace EV_Testing_report_DEMO
         float[] cp_sample_AB;
         float[] cp_sample_BC;
         float[] cp_sample_CD;
+
+        byte[] bluetoothData = new byte[1048576];
 
         public Form1() {
             InitializeComponent();
@@ -89,6 +98,169 @@ namespace EV_Testing_report_DEMO
 
             //Req_report.Enabled = esp32_module.IsOpen;
         }
+
+        void process_Json(string jsonIn) {
+            JSON_type_class jType = checkJSON(jsonIn);
+
+            if (receive_present_state == ReportReceive_states.Req_AB) {
+                if (jType == JSON_type_class.State_Transition) {
+                    read_result_A_to_B(JsonSerializer.Deserialize<State_Transition_Test>(jsonIn));
+                    //testing_Check[0] = true;
+                    receive_present_state = ReportReceive_states.Req_AB_Samp;
+                    updateProgress("Sampling State B...", 200 / 7);
+                    send_Bluetooth("CP_Sampling");
+                }
+            } else if (receive_present_state == ReportReceive_states.Req_AB_Samp) {
+                if (jType == JSON_type_class.Float_Array) {
+                    cp_sample_AB = JsonSerializer.Deserialize<float[]>(jsonIn);
+
+                    // update CP sample in front page
+                    update_CP_B2_Pic(DrawOscilloscope(cp_sample_AB, CP_B2_Pic.Width, CP_B2_Pic.Height, 50000.0f));
+
+                    hook_Test_BC_nonBlocking();
+                }
+            } else if (receive_present_state == ReportReceive_states.Req_BC) {
+                if (jType == JSON_type_class.State_Transition) {
+                    read_result_B_to_C(JsonSerializer.Deserialize<State_Transition_Test>(jsonIn));
+                    //testing_Check[1] = true;
+                    receive_present_state = ReportReceive_states.Req_BC_Samp;
+                    updateProgress("Sampling State C...", 400 / 7);
+                    send_Bluetooth("CP_Sampling");
+                }
+            } else if (receive_present_state == ReportReceive_states.Req_BC_Samp) {
+                if (jType == JSON_type_class.Float_Array) {
+                    cp_sample_BC = JsonSerializer.Deserialize<float[]>(jsonIn);
+                    // update CP sample in front page
+                    update_CP_C2_Pic(DrawOscilloscope(cp_sample_BC, CP_C2_Pic.Width, CP_C2_Pic.Height, 50000.0f));
+                    //hook_Test_CB_nonBlocking();
+                    hook_Test_BD_nonBlocking();
+                }
+
+            } else if (receive_present_state == ReportReceive_states.Req_BD) {
+                if (jType == JSON_type_class.State_Transition) {
+                    read_result_B_to_D(JsonSerializer.Deserialize<State_Transition_Test>(jsonIn));
+                    //testing_Check[3] = true;
+                    receive_present_state = ReportReceive_states.Req_BD_Samp;
+                    updateProgress("Sampling State D...", 600 / 7);
+                    send_Bluetooth("CP_Sampling");
+                }
+
+            } else if (receive_present_state == ReportReceive_states.Req_CB) {
+                if (jType == JSON_type_class.State_Transition) {
+                    read_result_C_to_B(JsonSerializer.Deserialize<State_Transition_Test>(jsonIn));
+                    //testing_Check[2] = true;
+                    receive_present_state = ReportReceive_states.Standby;
+                    updateProgress("Standby", 0);
+                    updateTestBTN(false);
+                }
+
+            } else if (receive_present_state == ReportReceive_states.Req_BD_Samp) {
+                if (jType == JSON_type_class.Float_Array) {
+                    cp_sample_CD = JsonSerializer.Deserialize<float[]>(jsonIn);
+                    // update CP sample in front page
+                    update_CP_D_Pic(DrawOscilloscope(cp_sample_CD, CP_D_Pic.Width, CP_D_Pic.Height, 50000.0f));
+                    receive_present_state = ReportReceive_states.Req_CB;
+                    hook_Test_CB_nonBlocking();
+                    updateProgress("Testing State C to B...", 700 / 7);
+                    //hook_Test_BD_nonBlocking();
+                }
+
+            } else if (receive_present_state == ReportReceive_states.Req_Diode) {
+                if (jType == JSON_type_class.Diode_Test) {
+
+                    if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Short) {
+                        updateTestBTN(false);
+                        updateProgress("Standby", 0);
+                        read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(jsonIn));
+                    } else if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Open) {
+                        //read_result_RCD(JsonSerializer.Deserialize<RCD0>(jsonIn));
+                        updateTestBTN(false);
+                        updateProgress("Standby", 0);
+                        read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(jsonIn));
+                    } else if (diode_TestCMD == Diode_Test_ENUM.TestPE_Open) {
+                        //read_result_Insulator(JsonSerializer.Deserialize<Insulation_Test>(jsonIn));
+                        updateTestBTN(false);
+                        updateProgress("Standby", 0);
+                        read_result_Diode(JsonSerializer.Deserialize<Diode_Test>(jsonIn));
+                    }
+
+                    receive_present_state = ReportReceive_states.Standby;
+                }
+            } else if (receive_present_state == ReportReceive_states.Req_RCD) {
+                if (jType == JSON_type_class.RCD0) {
+                    read_result_RCD(JsonSerializer.Deserialize<RCD0>(jsonIn));
+                    updateTestBTN(false);
+                    updateProgress("Standby", 0);
+                    receive_present_state = ReportReceive_states.Standby;
+                }
+            } else if (receive_present_state == ReportReceive_states.Req_Insul) {
+                if (jType == JSON_type_class.Insulation_Test) {
+
+                    receive_present_state = ReportReceive_states.Standby;
+                }
+            }
+        }
+        void receive_Json(string json_in) // This Function will be implement to Bluetooth receive Event
+        {
+
+            char[] str = json_in.ToCharArray();
+            // Check Layer
+            foreach (char c in str) {
+                if ((c == '{') || (c == '[')) {
+                    jsonObjLayer++;
+                }
+                if ((c == '}') || (c == ']')) {
+                    jsonObjLayer--;
+                }
+
+                if ((c != '\n') && (c != ' ') && (c != '\r')) {
+                    if (jsonObjLayer >= 0) {
+                        JsonMEM += c;
+                    }
+                }
+
+            }
+            if (jsonObjLayer == 0) { // Receive Complete
+                JsonOUTPUT = JsonMEM;
+                JsonMEM = "";
+                process_Json(JsonOUTPUT);
+            } else if (jsonObjLayer < 0) { // Receive Fail
+                jsonObjLayer = 0;
+                JsonMEM = "";
+                JsonOUTPUT = "";
+            }
+        }
+        // call back luse in bluetooth rceive json
+        private void ReadCallback(IAsyncResult result) {
+            try {
+                int payloadSize = bluetoothStream.EndRead(result);
+
+                if (payloadSize > 0) {
+                    byte[] packet = new byte[payloadSize];
+                    Array.Copy(bluetoothData, packet, payloadSize);
+                    Array.Clear(bluetoothData, 0, 1048576);
+                    try {
+                        string dataIN = Encoding.ASCII.GetString(packet);
+                        receive_Json(dataIN);
+                    } catch (IndexOutOfRangeException ex) {
+
+                    }
+                }
+
+                // Initiate read for another input
+                bluetoothStream.BeginRead(bluetoothData, 0, bluetoothData.Length, ReadCallback, null);
+
+            } catch (ObjectDisposedException ex) {
+                //bluetoothCancelRead.Cancel();
+                //MessageBox.Show(ex.Message);
+                //bluetoothCancelRead.Cancel();
+            } catch (IOException ex) {
+
+            } catch (NullReferenceException ex) {
+
+            }
+        }
+
         private void hook_Connect_ESP() {
             if (esp32_module.IsOpen == false) {
                 esp32_module.BaudRate = 115200;
@@ -623,15 +795,15 @@ namespace EV_Testing_report_DEMO
                 CB_PWM_Startup.Text = result_State_C_to_B.PWM_StartupDelay + " ms";
             }
 
-            
+
 
             CB_PWM_Amp.Text = result_State_C_to_B.PWM_Amplitude + " V";
 
-                CB_PWM_NVE.Text = result_State_C_to_B.PWM_NveAmplitude + " V";
-                CB_PWM_Freq.Text = result_State_C_to_B.PWM_Freq + " Hz";
-                CB_PWM_Duty.Text = result_State_C_to_B.PWM_DutyCycle + " %";
-                CB_PWM_Imax.Text = result_State_C_to_B.PWM_Imax + " A";
-            
+            CB_PWM_NVE.Text = result_State_C_to_B.PWM_NveAmplitude + " V";
+            CB_PWM_Freq.Text = result_State_C_to_B.PWM_Freq + " Hz";
+            CB_PWM_Duty.Text = result_State_C_to_B.PWM_DutyCycle + " %";
+            CB_PWM_Imax.Text = result_State_C_to_B.PWM_Imax + " A";
+
 
             CB_PWM_OffDel.Text = result_State_C_to_B.MainsOffDelay + " ms";
 
@@ -650,35 +822,35 @@ namespace EV_Testing_report_DEMO
                 CB_PWM_Amp_Result.ForeColor = Color.Red;
             }
 
-                if (result_State_C_to_B.PWM_NveAmplitude_Result) {
-                    CB_PWM_NVE_Result.Text = "Pass";
-                    CB_PWM_NVE_Result.ForeColor = Color.Green;
-                } else {
-                    CB_PWM_NVE_Result.Text = "Fail";
-                    CB_PWM_NVE_Result.ForeColor = Color.Red;
-                }
-                if (result_State_C_to_B.PWM_Freq_Result) {
-                    CB_PWM_Freq_Result.Text = "Pass";
-                    CB_PWM_Freq_Result.ForeColor = Color.Green;
-                } else {
-                    CB_PWM_Freq_Result.Text = "Fail";
-                    CB_PWM_Freq_Result.ForeColor = Color.Red;
-                }
-                if (result_State_C_to_B.PWM_DutyCycle_Result) {
-                    CB_PWM_Duty_Result.Text = "Pass";
-                    CB_PWM_Duty_Result.ForeColor = Color.Green;
-                } else {
-                    CB_PWM_Duty_Result.Text = "Fail";
-                    CB_PWM_Duty_Result.ForeColor = Color.Red;
-                }
-                if (result_State_C_to_B.PWM_Imax_Result) {
-                    CB_PWM_Imax_Result.Text = "Pass";
-                    CB_PWM_Imax_Result.ForeColor = Color.Green;
-                } else {
-                    CB_PWM_Imax_Result.Text = "Fail";
-                    CB_PWM_Imax_Result.ForeColor = Color.Red;
-                }
-            
+            if (result_State_C_to_B.PWM_NveAmplitude_Result) {
+                CB_PWM_NVE_Result.Text = "Pass";
+                CB_PWM_NVE_Result.ForeColor = Color.Green;
+            } else {
+                CB_PWM_NVE_Result.Text = "Fail";
+                CB_PWM_NVE_Result.ForeColor = Color.Red;
+            }
+            if (result_State_C_to_B.PWM_Freq_Result) {
+                CB_PWM_Freq_Result.Text = "Pass";
+                CB_PWM_Freq_Result.ForeColor = Color.Green;
+            } else {
+                CB_PWM_Freq_Result.Text = "Fail";
+                CB_PWM_Freq_Result.ForeColor = Color.Red;
+            }
+            if (result_State_C_to_B.PWM_DutyCycle_Result) {
+                CB_PWM_Duty_Result.Text = "Pass";
+                CB_PWM_Duty_Result.ForeColor = Color.Green;
+            } else {
+                CB_PWM_Duty_Result.Text = "Fail";
+                CB_PWM_Duty_Result.ForeColor = Color.Red;
+            }
+            if (result_State_C_to_B.PWM_Imax_Result) {
+                CB_PWM_Imax_Result.Text = "Pass";
+                CB_PWM_Imax_Result.ForeColor = Color.Green;
+            } else {
+                CB_PWM_Imax_Result.Text = "Fail";
+                CB_PWM_Imax_Result.ForeColor = Color.Red;
+            }
+
 
             if (result_State_C_to_B.MainsOffDelay_Result) {
                 CB_PWM_OffDel_Result.Text = "Pass";
@@ -817,7 +989,7 @@ namespace EV_Testing_report_DEMO
                     BD_PWM_Imax_Result.ForeColor = Color.Red;
                 }
             }
-            
+
 
 
             if (result_State_B_to_D.Voltage_Result) {
@@ -928,16 +1100,13 @@ namespace EV_Testing_report_DEMO
 
         }
         void read_result_Diode(Diode_Test s_diode) {
-
             result_diode_test = s_diode;
-
             if (DiodeShort_Delay.InvokeRequired) {
                 Action add_str = delegate {
                     read_result_Diode(s_diode);
                 };
                 DiodeShort_Delay.Invoke(add_str);
             } else {
-
                 if (diode_TestCMD == Diode_Test_ENUM.TestDiode_Short) {
                     diode_TestCMD = Diode_Test_ENUM.notTesting;
                     DiodeShort_Delay.Text = result_diode_test.Diode_ShortCircuit_MainsOffDelay + " ms";
@@ -949,10 +1118,7 @@ namespace EV_Testing_report_DEMO
                         Diode_Short_check.ForeColor = Color.Red;
                     }
                 }
-
-
             }
-
             if (diode_TestCMD == Diode_Test_ENUM.TestPE_Open) {
                 diode_TestCMD = Diode_Test_ENUM.notTesting;
                 PE_Open_Delay.Text = result_diode_test.PE_OpenCircuit_MainsOffDelay + " ms";
@@ -975,7 +1141,6 @@ namespace EV_Testing_report_DEMO
                     DiodeOpen_check.ForeColor = Color.Red;
                 }
             }
-
             // Front Page
             DiodeOpen_MainOff.Text = DiodeOpen_Delay.Text;
             PE_Open_MainOff.Text = PE_Open_Delay.Text;
@@ -988,8 +1153,6 @@ namespace EV_Testing_report_DEMO
             DiodeOpen_MainOff_sts.ForeColor = DiodeOpen_check.ForeColor;
             PE_Open_MainOff_sts.ForeColor = PE_Open_check.ForeColor;
             DiodeSh_MainOff_sts.ForeColor = Diode_Short_check.ForeColor;
-
-
         }
         void read_result_Insulator(Insulation_Test s_insu) {
 
@@ -1068,6 +1231,7 @@ namespace EV_Testing_report_DEMO
             clearDiode();
             clearRCD();
             clearInsu();
+            updateProgress("Standby", 0);
         }
 
         private void updateStatus_BTN() {
@@ -1121,7 +1285,10 @@ namespace EV_Testing_report_DEMO
         }
 
         private void Test_RCD_Click(object sender, EventArgs e) {
-            hook_Test_RCD();
+            //hook_Test_RCD();
+            hook_Test_RCD_nonBlocking();
+            updateProgress("Testing RCD...", 100);
+            updateTestBTN(true);
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
@@ -1134,21 +1301,30 @@ namespace EV_Testing_report_DEMO
 
         private void button1_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestDiode_Short;
-            hook_Test_Diode();
+            updateTestBTN(true);
+            updateProgress("Testing Diode Short Circuit...", 100);
+            //hook_Test_Diode();
+            hook_Test_Diode_nonBlocking();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
         private void Test_PE_open_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestPE_Open;
-            hook_Test_PE_Open();
+            updateProgress("Testing PE Open Circuit...", 100);
+            updateTestBTN(true);
+            //hook_Test_PE_Open();
+            hook_Test_PE_Open_nonBlocking();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
 
         private void Test_diode_open_Click(object sender, EventArgs e) {
             diode_TestCMD = Diode_Test_ENUM.TestDiode_Open;
-            hook_Test_DiodeOpen();
+            updateProgress("Testing Diode Open Circuit...", 100);
+            updateTestBTN(true);
+            //hook_Test_DiodeOpen();
+            hook_Test_DiodeOpen_nonBlocking();
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
         }
@@ -1182,7 +1358,9 @@ namespace EV_Testing_report_DEMO
         private void Test_ALL_BTN_Click(object sender, EventArgs e) {
 
             scan_read = true;
-            hook_Test_AB();
+            updateTestBTN(true);
+            //hook_Test_AB();
+            hook_Test_AB_nonBlocking();
             // Lock all Test button
             if (commu_mode == EVSE_Tester_CommunicationMode.SerialPort)
                 Enable_All_Test_BTN(false);
@@ -1446,25 +1624,15 @@ namespace EV_Testing_report_DEMO
             clearDiode();
             clearRCD();
             clearInsu();
+
+            clearFrontDisplay_Diode_Open();
+            clearFrontDisplay_Diode_Short();
+            clearFrontDisplay_RCD();
+            clearFrontDisplay_PE_Open();
+            clearFrontDisplay_State();
         }
 
-        private void ExportDOCX_Click(object sender, EventArgs e) {
-            // using(WordDocument doc = new WordDocument())
-            // {
-            //     doc.EnsureMinimal();
-            // 
-            //     doc.LastParagraph.AppendText("Hello world");
-            // 
-            //     doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.docx");
-            //     doc.Close();
-            // }
-            /*            var value = new Dictionary<string, object>()
-                        {
-                            ["name"] = "Jack",
-                            ["surname"] = "Madison",
-                            ["date"] = DateTime.Now.ToString(),
-                        };
-            */
+        private void ExportDoc_Word() {
             SaveReportAs.FileName = "EVSE_Test_report_" + DeviceNo_Test.Text + " " + $"{DateTime.Now:dd-MM-yyyy hh-mm-ss}" + ".docx";
             DialogResult result = SaveReportAs.ShowDialog();
             string saveto_dir = "";
@@ -1488,9 +1656,6 @@ namespace EV_Testing_report_DEMO
                 if (result_State_B_to_D.Testing_Result) { bd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
                 else { bd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
                 */
-
-
-
                 MiniWordColorText AB_PWM_Startup_Text_Word;
                 MiniWordColorText AB_PWM_Amp_Text_Word;
                 MiniWordColorText AB_PWM_NVE_Text_Word;
@@ -1525,6 +1690,15 @@ namespace EV_Testing_report_DEMO
                 MiniWordColorText BD_PWM_MainFreq_Text_Word;
                 MiniWordColorText BD_PP_Text_Word;
 
+                //MiniWordColorText 
+
+                MiniWordColorText diode_sh_result;
+                MiniWordColorText pe_op_result;
+                MiniWordColorText diode_op_result;
+
+                MiniWordColorText rcd_testing_result;
+
+                MiniWordColorText insulation_testing_result;
                 //                if (result_State_B_to_D.Testing_Result) { bd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
                 //                else { bd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
@@ -1562,23 +1736,14 @@ namespace EV_Testing_report_DEMO
                 if (result_State_B_to_D.MainsFreq_Result) { BD_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
                 if (result_State_B_to_D.PP_Result) { BD_PP_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PP_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
-                //MiniWordColorText 
-
-                MiniWordColorText diode_sh_result;
-                MiniWordColorText pe_op_result;
-                MiniWordColorText diode_op_result;
-
+                
                 if (result_diode_test.Diode_ShortCircuit_Result) { diode_sh_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_sh_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
                 if (result_diode_test.PE_OpenCircuit_Result) { pe_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { pe_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
                 if (result_diode_test.Diode_OpenCircuit_Result) { diode_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
-                MiniWordColorText rcd_testing_result;
                 if (result_rcd_test.RCD0_Result) { rcd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { rcd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
 
-                MiniWordColorText insulation_testing_result;
                 if (Insulation_Test.Insulation_Testing) { insulation_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { insulation_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
-
-
 
                 var value = new Dictionary<string, object>() {
                     // State A to B testing Result
@@ -1700,6 +1865,7 @@ namespace EV_Testing_report_DEMO
                     ["VratedB"] = Chg_VbRated.Text,
                     ["VratedC"] = Chg_VcRated.Text,
                     ["Frated"] = Chg_FreqRated.Text
+
                 };
                 //MiniWord.SaveAsByTemplate(Save_to.SelectedPath + "\\" + "EVSE_Test_report.docx", WordTemplate.FileName, value);
                 //Exp_to.Text = Save_to.SelectedPath;
@@ -1714,6 +1880,272 @@ namespace EV_Testing_report_DEMO
                 MiniWord.SaveAsByTemplate(saveto_dir, WordTemplate.FileName, value);
                 Exp_to.Text = saveto_dir;
             }
+        }
+        private void ExportDOCX_Click(object sender, EventArgs e) {
+            ExportDoc_Word();
+            //// using(WordDocument doc = new WordDocument())
+            //// {
+            ////     doc.EnsureMinimal();
+            //// 
+            ////     doc.LastParagraph.AppendText("Hello world");
+            //// 
+            ////     doc.Save(Save_to.SelectedPath + "\\" + "EVSE_Test_report.docx");
+            ////     doc.Close();
+            //// }
+            ///*            var value = new Dictionary<string, object>()
+            //            {
+            //                ["name"] = "Jack",
+            //                ["surname"] = "Madison",
+            //                ["date"] = DateTime.Now.ToString(),
+            //            };
+            //*/
+            //SaveReportAs.FileName = "EVSE_Test_report_" + DeviceNo_Test.Text + " " + $"{DateTime.Now:dd-MM-yyyy hh-mm-ss}" + ".docx";
+            //DialogResult result = SaveReportAs.ShowDialog();
+            //string saveto_dir = "";
+            //// If selected save dir then savefile otherwise do nothing
+            //if (result == DialogResult.OK) {
+            //    /*
+            //    MiniWordColorText ab_testing_result;
+            //    MiniWordColorText bc_testing_result;
+            //    MiniWordColorText cb_testing_result;
+            //    MiniWordColorText bd_testing_result;
+
+            //    if (result_State_A_to_B.Testing_Result) { ab_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
+            //    else { ab_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    if (result_State_B_to_C.Testing_Result) { bc_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
+            //    else { bc_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    if (result_State_C_to_B.Testing_Result) { cb_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
+            //    else { cb_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    if (result_State_B_to_D.Testing_Result) { bd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
+            //    else { bd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    */
+            //    MiniWordColorText AB_PWM_Startup_Text_Word;
+            //    MiniWordColorText AB_PWM_Amp_Text_Word;
+            //    MiniWordColorText AB_PWM_NVE_Text_Word;
+            //    MiniWordColorText AB_PWM_Freq_Text_Word;
+            //    MiniWordColorText AB_PWM_Duty_Text_Word;
+            //    MiniWordColorText AB_PWM_Imax_Text_Word;
+            //    MiniWordColorText BC_PWM_Startup_Text_Word;
+            //    MiniWordColorText BC_PWM_Amp_Text_Word;
+            //    MiniWordColorText BC_PWM_NVE_Text_Word;
+            //    MiniWordColorText BC_PWM_Freq_Text_Word;
+            //    MiniWordColorText BC_PWM_Duty_Text_Word;
+            //    MiniWordColorText BC_PWM_Imax_Text_Word;
+            //    MiniWordColorText BC_Voltage_Text_Word;
+            //    MiniWordColorText BC_PWM_OnDel_Text_Word;
+            //    MiniWordColorText BC_PWM_MainFreq_Text_Word;
+            //    MiniWordColorText BC_PP_Text_Word;
+            //    MiniWordColorText CB_PWM_Startup_Text_Word;
+            //    MiniWordColorText CB_PWM_Amp_Text_Word;
+            //    MiniWordColorText CB_PWM_NVE_Text_Word;
+            //    MiniWordColorText CB_PWM_Freq_Text_Word;
+            //    MiniWordColorText CB_PWM_Duty_Text_Word;
+            //    MiniWordColorText CB_PWM_Imax_Text_Word;
+            //    MiniWordColorText CB_PWM_OffDel_Text_Word;
+            //    MiniWordColorText BD_PWM_Startup_Text_Word;
+            //    MiniWordColorText BD_PWM_Amp_Text_Word;
+            //    MiniWordColorText BD_PWM_NVE_Text_Word;
+            //    MiniWordColorText BD_PWM_Freq_Text_Word;
+            //    MiniWordColorText BD_PWM_Duty_Text_Word;
+            //    MiniWordColorText BD_PWM_Imax_Text_Word;
+            //    MiniWordColorText BD_Voltage_Text_Word;
+            //    MiniWordColorText BD_PWM_OnDel_Text_Word;
+            //    MiniWordColorText BD_PWM_MainFreq_Text_Word;
+            //    MiniWordColorText BD_PP_Text_Word;
+
+            //    //                if (result_State_B_to_D.Testing_Result) { bd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; }
+            //    //                else { bd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    if (result_State_A_to_B.PWM_StartupDelay_Result) { AB_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_A_to_B.PWM_Amplitude_Result) { AB_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_A_to_B.PWM_NveAmplitude_Result) { AB_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_A_to_B.PWM_Freq_Result) { AB_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_A_to_B.PWM_DutyCycle_Result) { AB_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_A_to_B.PWM_Imax_Result) { AB_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { AB_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_StartupDelay_Result) { BC_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_Amplitude_Result) { BC_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_NveAmplitude_Result) { BC_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_Freq_Result) { BC_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_DutyCycle_Result) { BC_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PWM_Imax_Result) { BC_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.Voltage_Result) { BC_Voltage_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_Voltage_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.MainsOnDelay_Result) { BC_PWM_OnDel_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_OnDel_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.MainsFreq_Result) { BC_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_C.PP_Result) { BC_PP_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BC_PP_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_StartupDelay_Result) { CB_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_Amplitude_Result) { CB_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_NveAmplitude_Result) { CB_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_Freq_Result) { CB_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_DutyCycle_Result) { CB_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.PWM_Imax_Result) { CB_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_C_to_B.MainsOffDelay_Result) { CB_PWM_OffDel_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { CB_PWM_OffDel_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_StartupDelay_Result) { BD_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_Startup_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_Amplitude_Result) { BD_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_Amp_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_NveAmplitude_Result) { BD_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_NVE_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_Freq_Result) { BD_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_Freq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_DutyCycle_Result) { BD_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_Duty_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PWM_Imax_Result) { BD_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_Imax_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.Voltage_Result) { BD_Voltage_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_Voltage_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.MainsOnDelay_Result) { BD_PWM_OnDel_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_OnDel_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.MainsFreq_Result) { BD_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PWM_MainFreq_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_State_B_to_D.PP_Result) { BD_PP_Text_Word = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { BD_PP_Text_Word = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    //MiniWordColorText 
+
+            //    MiniWordColorText diode_sh_result;
+            //    MiniWordColorText pe_op_result;
+            //    MiniWordColorText diode_op_result;
+
+            //    if (result_diode_test.Diode_ShortCircuit_Result) { diode_sh_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_sh_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_diode_test.PE_OpenCircuit_Result) { pe_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { pe_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+            //    if (result_diode_test.Diode_OpenCircuit_Result) { diode_op_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { diode_op_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    MiniWordColorText rcd_testing_result;
+            //    if (result_rcd_test.RCD0_Result) { rcd_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { rcd_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+            //    MiniWordColorText insulation_testing_result;
+            //    if (Insulation_Test.Insulation_Testing) { insulation_testing_result = new MiniWordColorText { Text = "Pass", FontColor = "#50C878" }; } else { insulation_testing_result = new MiniWordColorText { Text = "Fail", FontColor = "#660000" }; }
+
+
+
+            //    var value = new Dictionary<string, object>() {
+            //        // State A to B testing Result
+            //        //["AB_Result"] = ab_testing_result,
+            //        ["AB_StDel"] = result_State_A_to_B.PWM_StartupDelay + " ms",
+            //        ["AB_Amp"] = result_State_A_to_B.PWM_Amplitude + " V",
+            //        ["AB_NveAmp"] = result_State_A_to_B.PWM_NveAmplitude + " V",
+            //        ["AB_Freq"] = result_State_A_to_B.PWM_Freq + " Hz",
+            //        ["AB_Duty"] = result_State_A_to_B.PWM_DutyCycle + " %",
+            //        ["AB_Imx"] = result_State_A_to_B.PWM_Imax + " A",
+
+            //        ["AB_StDel_Result"] = AB_PWM_Startup_Text_Word,
+            //        ["AB_Amp_Result"] = AB_PWM_Amp_Text_Word,
+            //        ["AB_NveAmp_Result"] = AB_PWM_NVE_Text_Word,
+            //        ["AB_Freq_Result"] = AB_PWM_Freq_Text_Word,
+            //        ["AB_Duty_Result"] = AB_PWM_Duty_Text_Word,
+            //        ["AB_Imx_Result"] = AB_PWM_Imax_Text_Word,
+
+            //        // State B to C testing Result
+            //        //["BC_Result"] = bc_testing_result,
+            //        ["BC_StDel"] = result_State_B_to_C.PWM_StartupDelay + " ms",
+            //        ["BC_Amp"] = result_State_B_to_C.PWM_Amplitude + " V",
+            //        ["BC_NveAmp"] = result_State_B_to_C.PWM_NveAmplitude + " V",
+            //        ["BC_Freq"] = result_State_B_to_C.PWM_Freq + " Hz",
+            //        ["BC_Duty"] = result_State_B_to_C.PWM_DutyCycle + " %",
+            //        ["BC_Imx"] = result_State_B_to_C.PWM_Imax + " A",
+            //        ["BC_MainOnDel"] = result_State_B_to_C.MainsOnDelay + " ms",
+            //        ["BC_MainFreq"] = result_State_B_to_C.MainsFreq + " Hz",
+            //        ["BC_Volt"] = result_State_B_to_C.Voltage + " V",
+            //        ["BC_PP"] = result_State_B_to_C.PP + " A",
+
+            //        ["BC_StDel_Result"] = BC_PWM_Startup_Text_Word,
+            //        ["BC_Amp_Result"] = BC_PWM_Amp_Text_Word,
+            //        ["BC_NveAmp_Result"] = BC_PWM_NVE_Text_Word,
+            //        ["BC_Freq_Result"] = BC_PWM_Freq_Text_Word,
+            //        ["BC_Duty_Result"] = BC_PWM_Duty_Text_Word,
+            //        ["BC_Imx_Result"] = BC_PWM_Imax_Text_Word,
+            //        ["BC_MainOnDel_Result"] = BC_Voltage_Text_Word,
+            //        ["BC_MainFreq_Result"] = BC_PWM_OnDel_Text_Word,
+            //        ["BC_Volt_Result"] = BC_PWM_MainFreq_Text_Word,
+            //        ["BC_PP_Result"] = BC_PP_Text_Word,
+
+            //        // State C to B testing Result
+            //        //["CB_Result"] = cb_testing_result,
+            //        ["CB_StDel"] = result_State_C_to_B.PWM_StartupDelay + " ms",
+            //        ["CB_Amp"] = result_State_C_to_B.PWM_Amplitude + " V",
+            //        ["CB_NveAmp"] = result_State_C_to_B.PWM_NveAmplitude + " V",
+            //        ["CB_Freq"] = result_State_C_to_B.PWM_Freq + " Hz",
+            //        ["CB_Duty"] = result_State_C_to_B.PWM_DutyCycle + " %",
+            //        ["CB_Imx"] = result_State_C_to_B.PWM_Imax + " A",
+            //        ["CB_MainOffDel"] = result_State_C_to_B.MainsOffDelay + " ms",
+
+            //        ["CB_StDel_Result"] = CB_PWM_Startup_Text_Word,
+            //        ["CB_Amp_Result"] = CB_PWM_Amp_Text_Word,
+            //        ["CB_NveAmp_Result"] = CB_PWM_NVE_Text_Word,
+            //        ["CB_Freq_Result"] = CB_PWM_Freq_Text_Word,
+            //        ["CB_Duty_Result"] = CB_PWM_Duty_Text_Word,
+            //        ["CB_Imx_Result"] = CB_PWM_Imax_Text_Word,
+            //        ["CB_MainOffDel_Result"] = CB_PWM_OffDel_Text_Word,
+
+            //        // State B to D testing Result
+            //        //["BD_Result"] = bd_testing_result,
+            //        ["BD_StDel"] = result_State_B_to_D.PWM_StartupDelay + " ms",
+            //        ["BD_Amp"] = result_State_B_to_D.PWM_Amplitude + " V",
+            //        ["BD_NveAmp"] = result_State_B_to_D.PWM_NveAmplitude + " V",
+            //        ["BD_Freq"] = result_State_B_to_D.PWM_Freq + " Hz",
+            //        ["BD_Duty"] = result_State_B_to_D.PWM_DutyCycle + " %",
+            //        ["BD_Imx"] = result_State_B_to_D.PWM_Imax + " A",
+            //        ["BD_MainOnDel"] = result_State_B_to_D.MainsOnDelay + " ms",
+            //        ["BD_MainFreq"] = result_State_B_to_D.MainsFreq + " Hz",
+            //        ["BD_Volt"] = result_State_B_to_D.Voltage + " V",
+            //        ["BD_PP"] = result_State_B_to_D.PP + " A",
+
+            //        ["BD_StDel_Result"] = BD_PWM_Startup_Text_Word,
+            //        ["BD_Amp_Result"] = BD_PWM_Amp_Text_Word,
+            //        ["BD_NveAmp_Result"] = BD_PWM_NVE_Text_Word,
+            //        ["BD_Freq_Result"] = BD_PWM_Freq_Text_Word,
+            //        ["BD_Duty_Result"] = BD_PWM_Duty_Text_Word,
+            //        ["BD_Imx_Result"] = BD_PWM_Imax_Text_Word,
+            //        ["BD_MainOnDel_Result"] = BD_Voltage_Text_Word,
+            //        ["BD_MainFreq_Result"] = BD_PWM_OnDel_Text_Word,
+            //        ["BD_Volt_Result"] = BD_PWM_MainFreq_Text_Word,
+            //        ["BD_PP_Result"] = BD_PP_Text_Word,
+
+            //        // Diode Testing Result
+            //        ["D_Sh_result"] = diode_sh_result,
+            //        ["D_Sh_OffDel"] = result_diode_test.Diode_ShortCircuit_MainsOffDelay + " ms",
+            //        ["PE_Op_result"] = pe_op_result,
+            //        ["PE_Op_OffDel"] = result_diode_test.PE_OpenCircuit_MainsOffDelay + " ms",
+            //        ["D_Op_result"] = diode_op_result,
+            //        ["D_Op_OffDel"] = result_diode_test.Diode_OpenCircuit_MainsOffDelay + " ms",
+
+            //        // RCD Testing Result
+            //        ["RCD_result"] = rcd_testing_result,
+            //        ["RCD_TripTime"] = result_rcd_test.Trip_Time + " ms",
+            //        ["RCD_Lim"] = result_rcd_test.Limit + " ms",
+            //        ["RCD_Current"] = result_rcd_test.Current + " mA",
+
+            //        // Insulation Testing Result
+            //        ["Insu_result"] = insulation_testing_result,
+            //        ["Insu_L_PE"] = Insulation_Test.L_PE + " Ω",
+            //        ["Insu_N_PE"] = Insulation_Test.N_PE + " Ω",
+            //        ["Insu_Volt"] = Insulation_Test.Voltage + " V",
+
+            //        // Testing Info
+            //        ["Date_testing"] = $"{DateTime.Now:dd/MM/yyyy}",//DateTime.Now;
+            //        ["Substation_Name"] = Substation_Test.Text,
+            //        ["Device_Number"] = DeviceNo_Test.Text,
+            //        ["Customer_Name"] = Customer_name.Text,
+            //        ["Tester_Name"] = Tester_name.Text,
+
+            //        // Charger Info
+            //        ["mfr"] = Chg_MFR.Text,
+            //        ["type"] = Chg_Typ.Text,
+            //        ["year_mfr"] = Chg_YOMFR.Text,
+            //        ["serial_no"] = Chg_SerNo.Text,
+            //        ["Irated"] = Chg_Irated.Text,
+            //        ["VratedA"] = Chg_VaRated.Text,
+            //        ["VratedB"] = Chg_VbRated.Text,
+            //        ["VratedC"] = Chg_VcRated.Text,
+            //        ["Frated"] = Chg_FreqRated.Text
+
+            //    };
+            //    //MiniWord.SaveAsByTemplate(Save_to.SelectedPath + "\\" + "EVSE_Test_report.docx", WordTemplate.FileName, value);
+            //    //Exp_to.Text = Save_to.SelectedPath;
+
+
+            //    if (SaveReportAs.FileName.IndexOf(".docx") == -1) // add .docx when no .docx found in name
+            //    {
+            //        SaveReportAs.FileName += ".docx";
+            //    }
+            //    saveto_dir = SaveReportAs.FileName;
+
+            //    MiniWord.SaveAsByTemplate(saveto_dir, WordTemplate.FileName, value);
+            //    Exp_to.Text = saveto_dir;
+            //}
 
         }
 
@@ -1781,10 +2213,14 @@ namespace EV_Testing_report_DEMO
                         BluetoothEndPoint endPoint = new BluetoothEndPoint(Selected_Device.DeviceAddress, BluetoothService.SerialPort);
                         client.Connect(endPoint);
                         bluetoothStream = client.GetStream();
-                        bluetoothStream.ReadTimeout = 30000; // set read timeout to 5 sec
+                        //bluetoothStream.ReadTimeout = 30000; // set read timeout to 5 sec
+                        bluetoothStream.ReadTimeout = -1;
 
                         bluetooth_connecting = true;
                         Bluetooth_Connect.Text = "Disconnect";
+
+                        // try to add begin read callback
+                        bluetoothStream.BeginRead(bluetoothData, 0, bluetoothData.Length, ReadCallback, null);
 
                         COM_Input.Enabled = false;
                         Connect_ESP_BTN.Enabled = false;
@@ -1860,6 +2296,7 @@ namespace EV_Testing_report_DEMO
             }
 
         }
+        // olf methid reveibing bluetooth in blickomg mode
         private string receive_Bluetooth() {
             string indata = "";
             int rem_;
@@ -1928,7 +2365,6 @@ namespace EV_Testing_report_DEMO
 
             return indata;
         }
-
 
         private void INJ_readCP_Click(object sender, EventArgs e) {
             send_Bluetooth("read_CP\n");
@@ -2510,6 +2946,211 @@ namespace EV_Testing_report_DEMO
         private void ManualTestBTN_Click_1(object sender, EventArgs e) {
 
         }
+        //---------------------------------------------------------------------------------
+        private JSON_type_class checkJSON(string json_In) {
+            if (json_In == "") {
+                return JSON_type_class.Unknown;
+            }
+            try {
+
+                JToken token = JToken.Parse(json_In);
+                if (token.Type == JTokenType.Array) {
+                    //float[] arr = JsonSerializer.Deserialize<float[]>(json_In);
+                    //testJsonCheck.Text = "JSON Valid for Float Array, Length: " + arr.Length;
+                    return JSON_type_class.Float_Array;
+                } else if (token.Type == JTokenType.Object) {
+                    JsonDocument jdoc = JsonDocument.Parse(json_In);
+                    JsonElement root = jdoc.RootElement;
+                    if (root.TryGetProperty("State_To_Test", out JsonElement stateElement)) {
+                        //string stateToTest = stateElement.GetString();
+                        //testJsonCheck.Text = "JSON Valid for State: " + stateToTest;
+                        return JSON_type_class.State_Transition;
+                    } else if (root.TryGetProperty("Diode_ShortCircuit_Result", out JsonElement jsonElement)) {
+                        //string diodeResult = jsonElement.GetBoolean().ToString();
+                        //testJsonCheck.Text = "JSON Valid for Diode Test, Short Circuit Result: " + diodeResult;
+                        return JSON_type_class.Diode_Test;
+                    } else if (root.TryGetProperty("Insulation_Testing", out JsonElement insulElement)) {
+                        //string insulTesting = insulElement.GetBoolean().ToString();
+                        //testJsonCheck.Text = "JSON Valid for Insulation Test, Testing: " + insulTesting;
+                        return JSON_type_class.Insulation_Test;
+                    } else if (root.TryGetProperty("RCD0_Result", out JsonElement rcdElement)) {
+                        //string rcdResult = rcdElement.GetBoolean().ToString();
+                        //testJsonCheck.Text = "JSON Valid for RCD0 Test, Result: " + rcdResult;
+                        return JSON_type_class.RCD0;
+                    } else {
+                        //testJsonCheck.Text = "JSON Valid but unknown structure.";
+                        return JSON_type_class.Unknown;
+                    }
+                }
+
+            } catch (ArgumentException ex) {
+                //testJsonCheck.Text = "JSON Argument Error: " + ex.Message;
+                return JSON_type_class.Unknown;
+            }
+
+            return JSON_type_class.Unknown;
+        }
+
+        private void button2_Click(object sender, EventArgs e) {
+            State_Transition_Test state = new State_Transition_Test();
+            state.State_To_Test = "Test_State_AB";
+            state.PWM_Amplitude = "10.5";
+            state.PWM_Amplitude_Result = true;
+            state.PWM_NveAmplitude = "-10.5";
+            state.PWM_NveAmplitude_Result = true;
+            state.PWM_DutyCycle = "55.0";
+            state.PWM_DutyCycle_Result = true;
+            state.PWM_Freq = "1000";
+            state.PWM_Freq_Result = true;
+            state.PWM_Imax = "16.0";
+            state.PWM_Imax_Result = true;
+
+            string jsonString = JsonSerializer.Serialize(state);
+            checkJSON(jsonString);
+            Clipboard.SetText(jsonString);
+        }
+
+        private void button3_Click(object sender, EventArgs e) {
+            Diode_Test diode = new Diode_Test();
+            diode.Diode_ShortCircuit_MainsOffDelay = "150";
+            diode.Diode_ShortCircuit_Result = true;
+            diode.Diode_OpenCircuit_MainsOffDelay = "200";
+            diode.Diode_OpenCircuit_Result = true;
+            diode.PE_OpenCircuit_MainsOffDelay = "180";
+            diode.PE_OpenCircuit_Result = true;
+
+            string jsonString = JsonSerializer.Serialize(diode);
+            checkJSON(jsonString);
+            Clipboard.SetText(jsonString);
+        }
+
+        private void button4_Click(object sender, EventArgs e) {
+            Insulation_Test insul = new Insulation_Test();
+            insul.Insulation_Testing = true;
+            insul.L_PE = "5.6";
+            insul.N_PE = "6.2";
+            insul.Voltage = "500";
+
+            string jsonString = JsonSerializer.Serialize(insul);
+            checkJSON(jsonString);
+            Clipboard.SetText(jsonString);
+
+        }
+
+        private void button5_Click(object sender, EventArgs e) {
+            RCD0 rcd = new RCD0();
+            rcd.Trip_Time = "20";
+            rcd.Limit = "30";
+            rcd.Current = "25";
+            rcd.RCD0_Result = true;
+
+            string jsonString = JsonSerializer.Serialize(rcd);
+            checkJSON(jsonString);
+            Clipboard.SetText(jsonString);
+        }
+
+        private void button6_Click(object sender, EventArgs e) {
+            float[] test_array = new float[400];
+            foreach (var i in Enumerable.Range(0, 400)) {
+                test_array[i] = (float)(Math.Sin(2 * Math.PI * i / 40) * 10.0);
+            }
+            string jsonString = JsonSerializer.Serialize(test_array);
+            checkJSON(jsonString);
+            Clipboard.SetText(jsonString);
+        }
+
+        private void cancelBTN_Click_1(object sender, EventArgs e) {
+            send_Bluetooth("Terminate_Test");
+            updateTestBTN(false);
+            updateProgress("Standby", 0);
+        }
+
+        private void testExpBTN_Click(object sender, EventArgs e) {
+            result_State_A_to_B.PWM_StartupDelay_Result = true;
+            result_State_A_to_B.PWM_Amplitude_Result = true;
+            result_State_A_to_B.PWM_NveAmplitude_Result = true;
+            result_State_A_to_B.PWM_Freq_Result = true;
+            result_State_A_to_B.PWM_DutyCycle_Result = true;
+            result_State_A_to_B.PWM_Imax_Result = true;
+            result_State_B_to_C.PWM_StartupDelay_Result = true;
+            result_State_B_to_C.PWM_Amplitude_Result = true;
+            result_State_B_to_C.PWM_NveAmplitude_Result = true;
+            result_State_B_to_C.PWM_Freq_Result = true;
+            result_State_B_to_C.PWM_DutyCycle_Result = true;
+            result_State_B_to_C.PWM_Imax_Result = true;
+            result_State_B_to_C.Voltage_Result = true;
+            result_State_B_to_C.MainsOnDelay_Result = true;
+            result_State_B_to_C.MainsFreq_Result = true;
+            result_State_B_to_C.PP_Result = true;
+            result_State_C_to_B.PWM_StartupDelay_Result = true;
+            result_State_C_to_B.PWM_Amplitude_Result = true;
+            result_State_C_to_B.PWM_NveAmplitude_Result = true;
+            result_State_C_to_B.PWM_Freq_Result = true;
+            result_State_C_to_B.PWM_DutyCycle_Result = true;
+            result_State_C_to_B.PWM_Imax_Result = true;
+            result_State_C_to_B.MainsOffDelay_Result = true;
+            result_State_B_to_D.PWM_StartupDelay_Result = true;
+            result_State_B_to_D.PWM_Amplitude_Result = true;
+            result_State_B_to_D.PWM_NveAmplitude_Result = true;
+            result_State_B_to_D.PWM_Freq_Result = true;
+            result_State_B_to_D.PWM_DutyCycle_Result = true;
+            result_State_B_to_D.PWM_Imax_Result = true;
+            result_State_B_to_D.Voltage_Result = true;
+            result_State_B_to_D.MainsOnDelay_Result = true;
+            result_State_B_to_D.MainsFreq_Result = true;
+            result_State_B_to_D.PP_Result = true;
+
+
+            result_diode_test.Diode_ShortCircuit_Result = false;
+            result_diode_test.PE_OpenCircuit_Result = false;
+            result_diode_test.Diode_OpenCircuit_Result = false;
+
+            result_rcd_test.RCD0_Result = true;
+
+            Insulation_Test.Insulation_Testing = false;
+
+            result_State_A_to_B.PWM_StartupDelay = "test1";
+            result_State_A_to_B.PWM_Amplitude  = "test2";
+            result_State_A_to_B.PWM_NveAmplitude  = "test3";
+            result_State_A_to_B.PWM_Freq  = "test4";
+            result_State_A_to_B.PWM_DutyCycle  = "test5";
+            result_State_A_to_B.PWM_Imax  = "test6";
+            result_State_B_to_C.PWM_StartupDelay  = "test7";
+            result_State_B_to_C.PWM_Amplitude  = "test8";
+            result_State_B_to_C.PWM_NveAmplitude  = "test9";
+            result_State_B_to_C.PWM_Freq  = "test10";
+            result_State_B_to_C.PWM_DutyCycle  = "test11";
+            result_State_B_to_C.PWM_Imax  = "test12";
+            result_State_B_to_C.MainsOnDelay  = "test13";
+            result_State_B_to_C.MainsFreq  = "test14";
+            result_State_B_to_C.Voltage  = "test15";
+            result_State_B_to_C.PP  = "test16";
+            result_State_C_to_B.PWM_StartupDelay  = "test17";
+            result_State_C_to_B.PWM_Amplitude  = "test18";
+            result_State_C_to_B.PWM_NveAmplitude  = "test19";
+            result_State_C_to_B.PWM_Freq  = "test20";
+            result_State_C_to_B.PWM_DutyCycle  = "test21";
+            result_State_C_to_B.PWM_Imax  = "test22";
+            result_State_C_to_B.MainsOffDelay  = "test23";
+            result_State_B_to_D.PWM_StartupDelay  = "test24";
+            result_State_B_to_D.PWM_Amplitude  = "test25";
+            result_State_B_to_D.PWM_NveAmplitude  = "test26";
+            result_State_B_to_D.PWM_Freq  = "test27";
+            result_State_B_to_D.PWM_DutyCycle  = "test28";
+            result_State_B_to_D.PWM_Imax  = "test29";
+            result_State_B_to_D.MainsOnDelay  = "test30";
+            result_State_B_to_D.MainsFreq  = "test31";
+            result_State_B_to_D.Voltage  = "test32";
+            result_State_B_to_D.PP  = "test33";
+            result_diode_test.Diode_ShortCircuit_MainsOffDelay  = "test34";
+            result_diode_test.PE_OpenCircuit_MainsOffDelay  = "test35";
+            result_diode_test.Diode_OpenCircuit_MainsOffDelay  = "test36";
+            result_rcd_test.Trip_Time  = "test37";
+            result_rcd_test.Limit  = "test38";
+            result_rcd_test.Current  = "test39";
+            ExportDoc_Word();
+        }
+        //---------------------------------------------------------------------------------
     }
 
 
@@ -2518,12 +3159,16 @@ namespace EV_Testing_report_DEMO
     {
         Standby,
         Req_AB,
+        Req_AB_Samp,
         Req_BC,
+        Req_BC_Samp,
         Req_CB,
         Req_BD,
+        Req_BD_Samp,
+
         Req_RCD,
         Req_Insul,
-        Req_Diode
+        Req_Diode,
     }
 
     enum EVSE_Tester_CommunicationMode
@@ -2544,5 +3189,14 @@ namespace EV_Testing_report_DEMO
         EV_State_B,
         EV_State_C,
         EV_State_D
+    }
+
+    enum JSON_type_class {
+        Unknown,
+        State_Transition,
+        Diode_Test,
+        Insulation_Test,
+        RCD0,
+        Float_Array
     }
 }
